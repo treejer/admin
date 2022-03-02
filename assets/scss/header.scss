@@ -1,0 +1,163 @@
+.headers {
+  .navbar-nav.header-menu {
+    margin-left: 58px;
+  }
+  .accounting-card{
+    .img{
+      z-index: +99;
+    }
+    .param-sm{
+      background-color: #EEEEEE;
+      padding: 5px 20px 5px 15px;
+      border: solid 2px white;
+      border-radius: 25px;
+      border-right: 0;
+      position: absolute;
+      right: 90px;
+      z-index: 5;
+      //overflow: hidden;
+      //text-overflow: ellipsis;
+      //white-space: nowrap;
+      //width: 110px;
+
+    }
+  }
+
+  .header-menu {
+    font-size: 14px;
+    font-weight: bolder;
+    color: #616161;
+    padding-top: 5px;
+
+    .nav-item {
+      padding: 15px 35px 25px 0;
+
+      a {
+        font-family: Montserrat-Medium;
+        font-size: 14px;
+        font-weight: 500;
+        position: relative;
+        font-stretch: normal;
+        font-style: normal;
+        line-height: 1.29;
+      }
+
+      a:after {
+        position: absolute;
+        content: '';
+        border-right: solid 1px gray;
+        width: 3px;
+        height: 50%;
+        right: -23%;
+        align-items: center;
+        vertical-align: middle;
+
+      }
+      @media (max-width: 768px) {
+        a:after {
+          border-right: none;
+        }
+      }
+
+      li:last-child > a {
+        display: none;
+
+      }
+    }
+
+    .nav-item:last-child > a:after {
+      display: none;
+
+    }
+
+    .nav-item.active {
+      a {
+        color: #5a9d79;
+
+      }
+
+      a:after {
+        border-right: solid 1px #5a9d79;
+      }
+    }
+  }
+
+  height: auto;
+  background: #faf8f1;
+
+  .connect-button {
+    width: 128px;
+    height: 32px;
+    border-radius: 20px;
+    background-color: #424242;
+    font-family: Montserrat-Medium;
+    font-size: 12px;
+    font-weight: 500;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.25;
+    letter-spacing: normal;
+    color: #f5f5f5;
+  }
+
+  img[alt='logo'] {
+    width: 71px;
+    height: 71px;
+    object-fit: contain;
+  }
+
+  img.tree {
+    width: 27px;
+    height: 36px;
+    object-fit: contain;
+    margin: 0 0px 0px 20px;
+  }
+}
+
+
+/*
+  ##Device = Most of the Smartphones Mobiles (Portrait)
+  ##Screen = B/w 320px to 479px
+*/
+@media (max-width:991px ) and (min-width: 768px){
+  .headers .accounting-card .param-sm {
+    right: 52%;
+  }
+}
+@media (max-width: 768px) {
+  .dashboard-header{
+    .navbar-toggler {
+      display: none;
+    }
+  }
+  .headers{
+
+    .accounting-card{
+      .img{
+        margin-left: 45px;
+        img{
+          display:inline!important;
+        }
+      }
+      .param-sm{
+        right: 25%;
+
+      }
+    }
+    img.tree{
+      width: 27px;
+      height: 36px;
+      -o-object-fit: contain;
+      object-fit: contain;
+      margin:0 15px;
+    }
+  }
+
+  .headers .header-menu .nav-item a {
+    font-size: 12px;
+
+  }
+  .headers .header-menu .nav-item {
+    padding: 5px;
+  }
+}
