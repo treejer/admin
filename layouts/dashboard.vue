@@ -16,10 +16,9 @@
 import DashboardHeader from "../components/DashboardHeader";
 import Footer from "../components/Footer";
 import Sidebar from "../components/Sidebar";
-import Router from "vue-router";
 
 export default {
-  components: { Sidebar, Footer, DashboardHeader, Router },
+  components: { Sidebar, Footer, DashboardHeader },
   middleware: 'queryParamToCookie',
   created() {
     if(this.$nuxt.isOffline){

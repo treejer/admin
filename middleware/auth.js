@@ -6,6 +6,7 @@ export default function ({store,redirect}) {
   if (!store.$cookies.get('account')) {
     const toast =new BToast()
     toast.$bvToast.toast("You must first connect your wallet to the website", {
+
       toaster: 'b-toaster-bottom-left',
       variant: 'danger',
       noAutoHide: true,
@@ -13,7 +14,6 @@ export default function ({store,redirect}) {
     })
     const history = store.$router.history.current.fullPath
     return redirect(history)
-    // return store.app._vm.$bvModal.show('five')
   }
   return null
 }

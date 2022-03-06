@@ -32,7 +32,7 @@
                 <tbody v-if="users">
                   <tr v-for="(user, index) in users" :key="index">
                     <td scope="row">{{ index + 1 }}</td>
-                    <td scope="row">{{ user.user._id }}</td>
+                    <td scope="row" v-if="user.user._id ">{{ user.user._id }}</td>
                     <td>
                       <span v-coin>{{
                         user.user.email
@@ -98,6 +98,7 @@ export default {
       users: null,
     };
   },
+  middleware:"auth",
 
   components: {
     Fab,
