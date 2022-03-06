@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container users-admin">
     <div class="row pl-3 pr-3">
       <div class="users col-12">
         <div class="row">
@@ -11,29 +11,53 @@
               <table class="table border-0 dir-ltr">
                 <thead>
                   <tr>
-                    <th scope="col">Tree ID</th>
+                    <th scope="col">Number</th>
+
+                    <th scope="col">ID</th>
                     <th class="pointer-event" scope="col">
                       <i class="pointer-event fas fa-sort-up"></i>Owner
                     </th>
                     <th class="pointer-event" scope="col">
+                      <i class="pointer-event fas fa-sort-up"></i>CreatedAt
+                    </th>
+                    <th class="pointer-event" scope="col">
                       <i class="pointer-event fas fa-sort-up"></i>Status
                     </th>
+
                     <th class="pointer-event d-none d-md-block" scope="col">
-                      <i class="pointer-event fas fa-sort-up"></i>Location
+                      <i class="pointer-event fas fa-sort-up"></i>Show detail
                     </th>
                   </tr>
                 </thead>
-                <tbody v-if="trees">
-                  <tr v-for="tree in trees" :key="tree.id">
-                    <th scope="row">{{ $hex2Dec(tree.id) }}</th>
-                    <td v-coin>
-                      {{ tree.funder !== null ? tree.funder.id : "-" }}
+                <tbody v-if="users">
+                  <tr v-for="(user, index) in users" :key="index">
+                    <td scope="row">{{ index + 1 }}</td>
+                    <td scope="row">{{ user.user._id }}</td>
+                    <td>
+                      <span v-coin>{{
+                        user.user.email
+                          ? user.user.email
+                          : user.user.publicAddress
+                      }}</span>
                     </td>
                     <td>
-                      {{ tree.treeStatus }}
+                      <span>{{ user.user.createdAt }}</span>
+                    </td>
+                    <td>
+                      <button
+                        @click.prevent="sendVerifyAndReject(user)"
+                        class=" btn-state-admin"
+                        :class="
+                          user.user.isVerified ? 'btn-green' : 'btn-warning'
+                        "
+                      >
+                        {{ user.user.isVerified ? "Verified" : "Pending" }}
+                      </button>
                     </td>
                     <td class="d-none d-md-block">
-                      {{ tree.latitude + "," + tree.longitude }}
+                      <nuxt-link :to="`/users/${user.user._id}`">
+                        <button class="btn-state-admin btn-green">Info</button>
+                      </nuxt-link>
                     </td>
                   </tr>
                 </tbody>
@@ -70,19 +94,18 @@ export default {
   layout: "dashboard",
   loading: false,
   data() {
-    return {};
+    return {
+      users: null,
+    };
   },
 
   components: {
     Fab,
   },
 
-  mounted() {
-    this.getUsers();
-    console.log(
-      this.$cookies.get("userId"),
-      "this.$store.state.userId.userId i shere"
-    );
+  async mounted() {
+    await this.getUsers();
+
     this.$nextTick(() => {
       this.$nuxt.$loading.start();
       setTimeout(() => this.$nuxt.$loading.finish(), 500);
@@ -91,32 +114,28 @@ export default {
 
   methods: {
     async getUsers() {
-
       let self = this;
 
       await this.$axios
-        .$get(
-          process.env.API_URL + "/admin/users?filters={}",
-          {
-            headers: {
-              "Accept": "application/json",
-              "x-auth-userid": this.$cookies.get("userId"),
-              "x-auth-logintoken": this.$cookies.get("loginToken"),
-            },
-          }
-        )
+        .$get(process.env.API_URL + "/admin/users?filters={}", {
+          headers: {
+            Accept: "application/json",
+            "x-auth-userid": this.$cookies.get("userId"),
+            "x-auth-logintoken": this.$cookies.get("loginToken"),
+          },
+        })
         .then((res) => {
-
-          if(res.statusCode && res.statusCode === 400) {
+          self.users = res;
+          console.log(self.users, "self.users is here");
+          if (res.statusCode && res.statusCode === 400) {
             self.$bvToast.toast(res.code, {
               variant: "danger",
               title: "Forbidden",
               toaster: "b-toaster-bottom-left",
             });
           }
-
-        }).catch((err) => {
-
+        })
+        .catch((err) => {
           self.$bvToast.toast(res.message, {
             variant: "danger",
             title: "Forbidden",
@@ -124,15 +143,33 @@ export default {
           });
         });
     },
+    async sendVerifyAndReject(user) {
+      let self = this;
+      if (user.user.isVerified) {
+        const res = await self.$axios.$patch(
+          `${process.env.API_URL}/admin/verify?userId=${user.user._id}`
+        );
+        console.log(res, "res is here");
+      } else {
+        const res = await self.$axios.$patch(
+          `${process.env.API_URL}/admin/reject?userId=${user.user._id}`
+        );
+        console.log(res, "res is here");
+      }
+    },
+    goToUserPage(id) {
+      this.$router.push(`/users/${id}`);
+    },
   },
 };
 </script>
 <style lang="scss" scoped>
-.users {
+.admin-user-table {
   position: relative;
   border: 1px solid #bdbdbd;
   box-sizing: border-box;
   border-radius: 12px;
+  margin-bottom: 150px;
   tr,
   td,
   th {
@@ -145,10 +182,7 @@ export default {
   .table thead {
     background: #e5e7db;
   }
-  table {
-    justify-content: center;
-    text-align: center;
-  }
+
   tr th {
     font-size: 14px;
     line-height: 17px;
@@ -159,7 +193,7 @@ export default {
   .btn-state-admin {
     padding: 5px 15px;
 
-    background: #b6677f;
+    border: none;
     border-radius: 6px;
   }
 }
