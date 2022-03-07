@@ -14,8 +14,13 @@
                     <th scope="col">Number</th>
 
                     <th scope="col">ID</th>
+
                     <th class="pointer-event" scope="col">
-                      <i class="pointer-event fas fa-sort-up"></i>Owner
+                      <i class="pointer-event fas fa-sort-up"></i>Name
+                    </th>
+
+                    <th class="pointer-event" scope="col">
+                      <i class="pointer-event fas fa-sort-up"></i>Wallet
                     </th>
                     <th class="pointer-event" scope="col">
                       <i class="pointer-event fas fa-sort-up"></i>CreatedAt
@@ -36,14 +41,21 @@
                       {{ user.user._id }}
                     </td>
                     <td>
-                      <span v-coin>{{
-                        user.user.email
-                          ? user.user.email
-                          : user.user.publicAddress
+                      <span>{{
+                        user.user.firstName + " " + user.user.lastName
                       }}</span>
                     </td>
                     <td>
-                      <span>{{ user.user.createdAt }}</span>
+                      <span v-coin>{{ user.user.publicAddress }}</span>
+                    </td>
+                    <td>
+                      <span>
+                        {{
+                          $moment(user.user.createdAt).strftime(
+                            "%Y-%m-%d %I:%M:%S"
+                          )
+                        }}
+                      </span>
                     </td>
                     <td>
                       <button
@@ -122,18 +134,19 @@ export default {
       await this.$axios
         .$get(`${process.env.API_URL}/admin/users?filters={}`)
         .then((res) => {
-          self.users = res;
-          console.log(self.users, "self.users is here");
           if (res.statusCode && res.statusCode === 400) {
             self.$bvToast.toast(res.code, {
               variant: "danger",
               title: "Forbidden",
               toaster: "b-toaster-bottom-left",
             });
+          } else {
+            self.users = res;
+            console.log(self.users, "self.users is here");
           }
         })
         .catch((err) => {
-          self.$bvToast.toast(res.message, {
+          self.$bvToast.toast(err.message, {
             variant: "danger",
             title: "Forbidden",
             toaster: "b-toaster-bottom-left",
