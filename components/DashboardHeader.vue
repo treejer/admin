@@ -1,13 +1,15 @@
 <template>
-  <div class="head-treejer-dashborad ">
-    <div class="headers container-fluid dashboard-header" style="min-height: 5vh">
+  <div class="head-treejer-dashborad">
+    <div
+      class="headers container-fluid dashboard-header"
+      style="min-height: 5vh"
+    >
       <keep-alive>
         <b-navbar toggleable="lg">
-      
           <b-navbar-nav>
             <client-only>
               <div class="d-lg-none d-block">
-                <Metamask @showModal="showModal"/>
+                <Metamask @showModal="showModal" />
               </div>
             </client-only>
           </b-navbar-nav>
@@ -15,20 +17,20 @@
 
           <b-collapse
             id="nav-collapse"
-            class="text-right justify-content-between d-none "
+            class="text-right justify-content-between d-none"
             is-nav
           >
-            <b-navbar-nav class="header-menu "></b-navbar-nav>
+            <b-navbar-nav class="header-menu"></b-navbar-nav>
             <client-only>
               <div class="d-lg-block d-none">
-                <Metamask @showModal="showModal"/>
+                <Metamask @showModal="showModal" />
               </div>
             </client-only>
           </b-collapse>
         </b-navbar>
       </keep-alive>
       <b-modal id="five" centered hide-footer title=" ">
-        <Wallets/>
+        <Wallets />
       </b-modal>
       <b-modal
         id="netName"
@@ -53,12 +55,11 @@
 </template>
 
 <script>
-
 import Metamask from "../components/Metamask";
 import Wallets from "../components/Wallets";
 
 export default {
-  layout: 'dashboard',
+  layout: "dashboard",
   name: "TreejerHeader",
   components: {
     Wallets,
@@ -67,11 +68,11 @@ export default {
   data() {
     return {
       wallets: [
-        {name: "Metamask", step: 1},
-        {name: "Wallet Connect", step: 2},
-        {name: "Trezor", step: 3},
-        {name: "Ledger Nano", step: 4},
-        {name: "Coinbase Wallet", step: 5}
+        { name: "Metamask", step: 1 },
+        { name: "Wallet Connect", step: 2 },
+        { name: "Trezor", step: 3 },
+        { name: "Ledger Nano", step: 4 },
+        { name: "Coinbase Wallet", step: 5 },
       ],
       activeWallet: 0,
       formError: null,
@@ -79,59 +80,62 @@ export default {
       user: false,
       activeIndex: 0,
       items: [
-        {name: "About", step: 1, href: 'about'},
-        {name: "Blog", step: 2},
-        {name: "For Business", step: 3, href: 'business'},
-        {name: "Find My Tree", step: 4, href: 'find'},
+        { name: "About", step: 1, href: "about" },
+        { name: "Blog", step: 2 },
+        { name: "For Business", step: 3, href: "business" },
+        { name: "Find My Tree", step: 4, href: "find" },
       ],
-      networkName: process.env.NETWORK_NAME
+      networkName: process.env.NETWORK_NAME,
     };
   },
   async mounted() {
-    let self = this
+    let self = this;
     // await web3.eth.getAccounts().then(res => {
-    self.account = this.$cookies.get('account')
-    await this.$store.dispatch('networkNames')
+    self.account = this.$cookies.get("account");
+    await this.$store.dispatch("networkNames");
     // })
-    await self.accountChange()
+    await self.accountChange();
     setTimeout(() => {
-
-      if(this.$web3.givenProvider === null) {
+      if (this.$web3.givenProvider === null) {
         return;
       }
 
-      this.$web3.eth.net.getId().then(netId => {
-
+      this.$web3.eth.net.getId().then((netId) => {
         if (netId.toString() === process.env.NETWORK_ID.toString()) {
-          return
+          return;
         }
-        self.$bvToast.toast('Switch to ' + process.env.NETWORK_NAME + ' Network', {
-          title: `Wrong network`,
-          href: 'https://blog.treejer.com/announcing-the-launch-of-treejer-protocol-with-genesis-trees/',
-          variant: 'danger',
-          solid: true,
-          toaster: 'b-toaster-bottom-left',
-          noAutoHide: true,
-        })
-      })
-    }, 1000)
+        self.$bvToast.toast(
+          "Switch to " + process.env.NETWORK_NAME + " Network",
+          {
+            title: `Wrong network`,
+            href: "https://blog.treejer.com/announcing-the-launch-of-treejer-protocol-with-genesis-trees/",
+            variant: "danger",
+            solid: true,
+            toaster: "b-toaster-bottom-left",
+            noAutoHide: true,
+          }
+        );
+      });
+    }, 1000);
   },
   computed: {},
   methods: {
     showModal(e) {
-      this.$bvModal.show('five')
+      this.$bvModal.show("five");
     },
     async accountChange() {
-      if (this.$cookies.get('walletName') === 'metamask') {
-        let self = this
+      if (this.$cookies.get("walletName") === "metamask") {
+        let self = this;
         if (process.client) {
-          await window.ethereum.on('accountsChanged', function (accounts) {
+          await window.ethereum.on("accountsChanged", function (accounts) {
             if (self.account !== accounts[0]) {
-              self.$store.commit('SET_USER', accounts[0])
-              self.$cookies.set('account', accounts[0])
-              let routeData = self.$router.resolve({path: `/forest/${accounts[0]}`, params: {id: accounts[0]}});
-              window.open(routeData.href, '_Self');
-
+              self.$store.commit("SET_USER", accounts[0]);
+              self.$cookies.set("account", accounts[0]);
+              let routeData = self.$router.resolve({
+                path: `/forest/${accounts[0]}`,
+                params: { id: accounts[0] },
+              });
+              window.open(routeData.href, "_Self");
             }
           });
         }
@@ -144,40 +148,39 @@ export default {
       this.$bvToast.toast(message, {
         title: title,
         variant: variant,
-        href: href
+        href: href,
       });
     },
     makeToast(variant = null) {
-      this.$bvToast.toast('install metamask from here', {
-        title: `https://metamask.io/' ${variant || 'default'}`,
-        href: 'https://metamask.io/',
+      this.$bvToast.toast("install metamask from here", {
+        title: `https://metamask.io/' ${variant || "default"}`,
+        href: "https://metamask.io/",
         variant: variant,
-        solid: true
-      })
+        solid: true,
+      });
     },
     activeMenu(item, index) {
-      if (item.name === 'Blog') {
-        window.open('https://blog.treejer.com/', '_blank')
+      if (item.name === "Blog") {
+        window.open("https://blog.treejer.com/", "_blank");
       } else {
         this.activeIndex = index;
       }
     },
   },
-  created() {
-
-  },
-
+  created() {},
 };
 </script>
 
 <style lang="scss">
-.head-treejer-dashborad{
-  .networkname{
-    background: linear-gradient(90deg, #649173 0%, #CEC99C 100%);
+.head-treejer-dashborad {
+  .networkname {
+    background: linear-gradient(90deg, #649173 0%, #cec99c 100%);
     height: 34px;
     z-index: +999;
   }
-
+  .navbar-light .navbar-toggler {
+    display: none;
+  }
 }
 @media (max-width: 1023px) {
   .headers {
@@ -195,13 +198,10 @@ export default {
       background-size: auto;
     }
 
-    .navbar-light .navbar-toggler {
-      color: rgba(0, 0, 0, 0.5);
-      border-color: transparent;
-    }
-
     .navbar {
       padding: 0;
+      width: 100%;
+      justify-content: flex-end;
     }
   }
 }

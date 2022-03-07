@@ -1,7 +1,7 @@
 <template>
   <div class="container admin-trees">
     <div class="row">
-      <div class="col-12 col-xl-8 col-md-6 offset-md-1 offset-xl-0  admin-left-side">
+      <div class="col-12 col-xl-8 col-md-6 offset-md-1 offset-xl-0  mb-5 pb-5  admin-left-side">
         <div class="box">
           <div class="header-box border-bottom">
             <p class="param-18 font-weight-bolder tr-gray-two">Tree Settings</p>
