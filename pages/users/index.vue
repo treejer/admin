@@ -32,7 +32,9 @@
                 <tbody v-if="users">
                   <tr v-for="(user, index) in users" :key="index">
                     <td scope="row">{{ index + 1 }}</td>
-                    <td scope="row" v-if="user.user._id ">{{ user.user._id }}</td>
+                    <td scope="row" v-if="user.user._id">
+                      {{ user.user._id }}
+                    </td>
                     <td>
                       <span v-coin>{{
                         user.user.email
@@ -46,7 +48,7 @@
                     <td>
                       <button
                         @click.prevent="sendVerifyAndReject(user)"
-                        class=" btn-state-admin"
+                        class="btn-state-admin"
                         :class="
                           user.user.isVerified ? 'btn-green' : 'btn-warning'
                         "
@@ -98,7 +100,7 @@ export default {
       users: null,
     };
   },
-  middleware:"auth",
+  middleware: "auth",
 
   components: {
     Fab,
@@ -116,15 +118,9 @@ export default {
   methods: {
     async getUsers() {
       let self = this;
-
+      self.loading = true;
       await this.$axios
-        .$get(process.env.API_URL + "/admin/users?filters={}", {
-          headers: {
-            Accept: "application/json",
-            "x-auth-userid": this.$cookies.get("userId"),
-            "x-auth-logintoken": this.$cookies.get("loginToken"),
-          },
-        })
+        .$get(`${process.env.API_URL}/admin/users?filters={}`)
         .then((res) => {
           self.users = res;
           console.log(self.users, "self.users is here");
@@ -142,24 +138,31 @@ export default {
             title: "Forbidden",
             toaster: "b-toaster-bottom-left",
           });
-        });
+        })
+        .finally(() => (self.loading = false));
     },
     async sendVerifyAndReject(user) {
       let self = this;
-      if (user.user.isVerified) {
+      self.loading = true;
+      if (user.user.isVerified === false) {
         const res = await self.$axios.$patch(
           `${process.env.API_URL}/admin/verify?userId=${user.user._id}`
         );
         console.log(res, "res is here");
-      } else {
+      }
+      if (user.user.isVerified) {
         const res = await self.$axios.$patch(
           `${process.env.API_URL}/admin/reject?userId=${user.user._id}`
         );
         console.log(res, "res is here");
       }
+      self.loading = false;
     },
     goToUserPage(id) {
+      self.loading = true;
+
       this.$router.push(`/users/${id}`);
+      self.loading = false;
     },
   },
 };
