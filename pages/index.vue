@@ -307,7 +307,6 @@ export default {
   .cards {
     display: flex;
     flex-direction: column;
-    padding: 20px 32px;
     width: 100%;
     min-height: 107px;
     background: #ffffff;
@@ -315,7 +314,6 @@ export default {
     border-radius: 6px;
     align-self: center;
     margin-bottom: 32px;
-
     padding: 30px;
     margin: 15px 15px;
     position: relative;
@@ -327,6 +325,11 @@ export default {
       div {
         font-family: Montserrat-Medium;
       }
+    }
+  }
+  @media (max-width: 677px) {
+    .cards {
+      margin: 0 0 15px 0;
     }
   }
 }

@@ -5,6 +5,18 @@
         <div class="row">
           <div class="col-12 py-3 pl-3">
             <h4 class="title-sm tr-gray-one text-left">Planters</h4>
+            <div class="position-relative w-50 search-admin-user-box">
+              <input
+                class="search-admin-user"
+                v-model="searchAdminUsers"
+                placeholder="Search by name or walletaddress"
+              />
+              <img
+                src="~/assets/images/tree-profile/search.svg"
+                alt="search"
+                class="search-icon"
+              />
+            </div>
           </div>
           <div class="col-12 col-md-12 p-0">
             <div class="admin-user-table">
@@ -35,7 +47,10 @@
                   </tr>
                 </thead>
                 <tbody v-if="users">
-                  <tr v-for="(user, index) in users" :key="index">
+                  <tr
+                    v-for="(user, index) in filterBy(users, searchAdminUsers)"
+                    :key="index"
+                  >
                     <td scope="row">{{ index + 1 }}</td>
                     <td scope="row" v-if="user.user._id">
                       {{ user.user._id }}
@@ -102,14 +117,18 @@
 </template>
 <script>
 import Fab from "@/components/font-awsome/Fab";
+import Vue2Filters from "vue2-filters";
 
 export default {
+  mixins: [Vue2Filters.mixin],
+
   name: "users",
   layout: "dashboard",
   loading: false,
   data() {
     return {
       users: null,
+      searchAdminUsers: "",
     };
   },
   middleware: "auth",
@@ -181,37 +200,66 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.admin-user-table {
-  position: relative;
-  border: 1px solid #bdbdbd;
-  box-sizing: border-box;
-  border-radius: 12px;
-  margin-bottom: 150px;
-  tr,
-  td,
-  th {
-    border: none;
-    font-size: 14px;
-    line-height: 17px;
-
-    color: #424242;
-  }
-  .table thead {
+.users-admin {
+  .search-admin-user {
+    min-width: 100%;
     background: #e5e7db;
-  }
-
-  tr th {
-    font-size: 14px;
-    line-height: 17px;
-    /* identical to box height */
-
-    color: #757575;
-  }
-  .btn-state-admin {
+    border: 2px solid #fff;
+    box-sizing: border-box;
+    border-radius: 18px;
     padding: 5px 15px;
+    font-size: 14px;
+  }
+  .search-icon {
+    position: absolute;
+    right: 50px;
+    top: 12px;
+  }
+  @media (max-width:767px) {
+    .search-admin-user-box{
+      width: 100%!important;
+    }
+    .search-admin-user {
+      font-size: 12px;
+    }
+    .search-icon {
+      right: 5px;
+      top: 8px;
+    }
+  }
+  .admin-user-table {
+    position: relative;
+    border: 1px solid #bdbdbd;
+    box-sizing: border-box;
+    border-radius: 12px;
+    margin-bottom: 150px;
+    overflow-x: scroll;
+    tr,
+    td,
+    th {
+      border: none;
+      font-size: 14px;
+      line-height: 17px;
 
-    border: none;
-    border-radius: 6px;
+      color: #424242;
+    }
+    .table thead {
+      background: #e5e7db;
+    }
+
+    tr th {
+      font-size: 14px;
+      line-height: 17px;
+      /* identical to box height */
+
+      color: #757575;
+    }
+    .btn-state-admin {
+      padding: 5px 15px;
+
+      border: none;
+      border-radius: 6px;
+    }
   }
 }
 </style>
