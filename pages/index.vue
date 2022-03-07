@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="row">
-      <div class="col-12 col-md-9 admin-left-side">
+      <div class="col-12 col-xl-9 col-lg-8 offset-lg-1 offset-xl-0 admin-left-side">
         <div class="row">
           <div class="col-12">
             <ul class="">
@@ -44,7 +44,7 @@
           </div>
         </div>
       </div>
-      <div class="col-12 col-md-3 admin-right-side pl-md-0 mt-md-5">
+      <div class="col-12 col-xl-3 col-lg-3 admin-right-side pl-md-0 mt-md-5">
         <div class="cards">
           <iframe
             src="https://dune.xyz/embeds/395442/754726/c9d5baae-33e5-412a-834a-fb90ad6be4e0"

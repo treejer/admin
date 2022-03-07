@@ -1,7 +1,7 @@
 <template>
   <div class="container users-admin">
     <div class="row pl-3 pr-3">
-      <div class="users col-12">
+      <div class="users col-12 col-xl-12 col-md-11 offset-md-1 offset-xl-0 ">
         <div class="row">
           <div class="col-12 py-3 pl-3">
             <h4 class="title-sm tr-gray-one text-left">Planters</h4>
@@ -234,6 +234,7 @@ export default {
     border-radius: 12px;
     margin-bottom: 150px;
     overflow-x: scroll;
+    
     tr,
     td,
     th {

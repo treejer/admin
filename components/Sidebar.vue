@@ -1,5 +1,5 @@
 <template>
-  <section class="sidebar pt-4 col-12 col-md-2 col-lg-1">
+  <section class="sidebar pt-4 col-12 col-md-1 col-xl-1">
     <ul class="nav flex-column">
       <li class="nav-item pointer-event dashboard" @click="changeIndex(0)">
         <nuxt-link to="/">
