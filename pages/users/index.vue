@@ -14,8 +14,13 @@
                     <th scope="col">Number</th>
 
                     <th scope="col">ID</th>
+
                     <th class="pointer-event" scope="col">
-                      <i class="pointer-event fas fa-sort-up"></i>Owner
+                      <i class="pointer-event fas fa-sort-up"></i>Name
+                    </th>
+
+                    <th class="pointer-event" scope="col">
+                      <i class="pointer-event fas fa-sort-up"></i>Wallet
                     </th>
                     <th class="pointer-event" scope="col">
                       <i class="pointer-event fas fa-sort-up"></i>CreatedAt
@@ -32,21 +37,30 @@
                 <tbody v-if="users">
                   <tr v-for="(user, index) in users" :key="index">
                     <td scope="row">{{ index + 1 }}</td>
-                    <td scope="row" v-if="user.user._id ">{{ user.user._id }}</td>
+                    <td scope="row">
+                      {{ user.user._id }}
+                    </td>
                     <td>
-                      <span v-coin>{{
-                        user.user.email
-                          ? user.user.email
-                          : user.user.publicAddress
+                      <span>{{
+                        user.user.firstName + " " + user.user.lastName
                       }}</span>
                     </td>
                     <td>
-                      <span>{{ user.user.createdAt }}</span>
+                      <span v-coin>{{ user.user.publicAddress }}</span>
+                    </td>
+                    <td>
+                      <span>
+                        {{
+                          $moment(user.user.createdAt).strftime(
+                            "%Y-%m-%d %I:%M:%S"
+                          )
+                        }}
+                      </span>
                     </td>
                     <td>
                       <button
                         @click.prevent="sendVerifyAndReject(user)"
-                        class=" btn-state-admin"
+                        class="btn-state-admin"
                         :class="
                           user.user.isVerified ? 'btn-green' : 'btn-warning'
                         "
@@ -98,7 +112,7 @@ export default {
       users: null,
     };
   },
-  middleware:"auth",
+  middleware: "auth",
 
   components: {
     Fab,
@@ -126,18 +140,19 @@ export default {
           },
         })
         .then((res) => {
-          self.users = res;
-          console.log(self.users, "self.users is here");
           if (res.statusCode && res.statusCode === 400) {
             self.$bvToast.toast(res.code, {
               variant: "danger",
               title: "Forbidden",
               toaster: "b-toaster-bottom-left",
             });
+          } else {
+            self.users = res;
+            console.log(self.users, "self.users is here");
           }
         })
         .catch((err) => {
-          self.$bvToast.toast(res.message, {
+          self.$bvToast.toast(err.message, {
             variant: "danger",
             title: "Forbidden",
             toaster: "b-toaster-bottom-left",
@@ -145,21 +160,59 @@ export default {
         });
     },
     async sendVerifyAndReject(user) {
-      let self = this;
-      if (user.user.isVerified) {
-        const res = await self.$axios.$patch(
-          `${process.env.API_URL}/admin/verify?userId=${user.user._id}`
-        );
-        console.log(res, "res is here");
-      } else {
-        const res = await self.$axios.$patch(
-          `${process.env.API_URL}/admin/reject?userId=${user.user._id}`
-        );
-        console.log(res, "res is here");
+      if (!confirm("Do you really want to change status?")) {
+        return;
       }
-    },
-    goToUserPage(id) {
-      this.$router.push(`/users/${id}`);
+
+      let self = this;
+
+      const path = user.user.isVerified ? "reject" : "verify";
+
+      await self.$axios
+        .$patch(
+          `${process.env.API_URL}/admin/${path}?userId=${user.user._id}`,
+          {},
+          {
+            headers: {
+              Accept: "application/json",
+              "x-auth-userid": this.$cookies.get("userId"),
+              "x-auth-logintoken": this.$cookies.get("loginToken"),
+            },
+          }
+        )
+        .then((res) => {
+          console.log(res, "res is here");
+
+          if (res.statusCode && res.statusCode === 400) {
+            self.$bvToast.toast(res.code, {
+              variant: "danger",
+              title: "Forbidden",
+              toaster: "b-toaster-bottom-left",
+            });
+          } else {
+            this.$bvToast.toast(
+              `User status successfully changed to ${
+                user.user.isVerified ? "Rejected" : "Verified"
+              }`,
+              {
+                variant: "success",
+                title: "Update status successful",
+                toaster: "b-toaster-bottom-left",
+              }
+            );
+
+            this.getUsers();
+          }
+        })
+        .catch((err) => {
+          console.log(err, "err is here");
+
+          self.$bvToast.toast(err.message, {
+            variant: "danger",
+            title: "Forbidden",
+            toaster: "b-toaster-bottom-left",
+          });
+        });
     },
   },
 };
