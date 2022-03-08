@@ -23,17 +23,7 @@ export default {
   },
   created() {},
   methods: {
-    hexEncode(str) {
-      var hex, i;
 
-      var result = "";
-      for (i = 0; i < str.length; i++) {
-        hex = str.charCodeAt(i).toString(16);
-        result += ("000" + hex).slice(-4);
-      }
-
-      return result;
-    },
     async getToken() {
       let self = this;
 
@@ -54,13 +44,17 @@ export default {
           var from = self.$cookies.get("account");
 
           var signature = await self.$web3.eth.personal.sign(
-            self.hexEncode(res.message),
+            res.message,
             from
-          );
+          ).then((signature) => {
+            console.log(signature, "signature");
 
-          console.log(signature, "signature");
+            self.sendWebAuthToken(signature, from, res.userId);
+          }).catch((err) => {
+            console.log(err, "err");
+          });
 
-          self.sendWebAuthToken(signature, from, res.userId);
+          
         });
     },
     async sendWebAuthToken(signature, loginToken, userId) {
