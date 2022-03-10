@@ -178,24 +178,19 @@ export default {
       self.loading = true;
       if (user.user.isVerified === false) {
         const res = await self.$axios.$patch(
-          `${process.env.API_URL}/admin/verify?userId=${user.user._id}`
+          `${process.env.API_URL}/admin/verify?userid=${user.user._id}`
         );
         console.log(res, "res is here");
       }
       if (user.user.isVerified) {
         const res = await self.$axios.$patch(
-          `${process.env.API_URL}/admin/reject?userId=${user.user._id}`
+          `${process.env.API_URL}/admin/reject?userid=${user.user._id}`
         );
         console.log(res, "res is here");
       }
       self.loading = false;
     },
-    goToUserPage(id) {
-      self.loading = true;
 
-      this.$router.push(`/users/${id}`);
-      self.loading = false;
-    },
   },
 };
 </script>
