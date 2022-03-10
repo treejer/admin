@@ -1,7 +1,7 @@
 <template>
   <div class="container users-admin">
     <div class="row pl-3 pr-3">
-      <div class="users col-12 col-xl-12 col-md-11 offset-md-1 offset-xl-0 ">
+      <div class="users col-12 col-xl-12 col-md-11 offset-md-1 offset-xl-0">
         <div class="row">
           <div class="col-12 py-3 pl-3">
             <h4 class="title-sm tr-gray-one text-left">Planters</h4>
@@ -174,23 +174,60 @@ export default {
         .finally(() => (self.loading = false));
     },
     async sendVerifyAndReject(user) {
-      let self = this;
-      self.loading = true;
-      if (user.user.isVerified === false) {
-        const res = await self.$axios.$patch(
-          `${process.env.API_URL}/admin/verify?userid=${user.user._id}`
-        );
-        console.log(res, "res is here");
+      if (!confirm("Do you really want to change status?")) {
+        return;
       }
-      if (user.user.isVerified) {
-        const res = await self.$axios.$patch(
-          `${process.env.API_URL}/admin/reject?userid=${user.user._id}`
-        );
-        console.log(res, "res is here");
-      }
-      self.loading = false;
-    },
 
+      let self = this;
+
+      const path = user.user.isVerified ? "reject" : "verify";
+
+      await self.$axios
+        .$patch(
+          `${process.env.API_URL}/admin/${path}?userid=${user.user._id}`,
+          {},
+          {
+            headers: {
+              Accept: "application/json",
+              "x-auth-userid": this.$cookies.get("userId"),
+              "x-auth-logintoken": this.$cookies.get("loginToken"),
+            },
+          }
+        )
+        .then((res) => {
+          console.log(res, "res is here");
+
+          if (res.statusCode && res.statusCode === 400) {
+            self.$bvToast.toast(res.code, {
+              variant: "danger",
+              title: "Forbidden",
+              toaster: "b-toaster-bottom-left",
+            });
+          } else {
+            this.$bvToast.toast(
+              `User status successfully changed to ${
+                user.user.isVerified ? "Rejected" : "Verified"
+              }`,
+              {
+                variant: "success",
+                title: "Update status successful",
+                toaster: "b-toaster-bottom-left",
+              }
+            );
+
+            this.getUsers();
+          }
+        })
+        .catch((err) => {
+          console.log(err, "err is here");
+
+          self.$bvToast.toast(err.message, {
+            variant: "danger",
+            title: "Forbidden",
+            toaster: "b-toaster-bottom-left",
+          });
+        });
+    },
   },
 };
 </script>
@@ -210,9 +247,9 @@ export default {
     right: 50px;
     top: 12px;
   }
-  @media (max-width:767px) {
-    .search-admin-user-box{
-      width: 100%!important;
+  @media (max-width: 767px) {
+    .search-admin-user-box {
+      width: 100% !important;
     }
     .search-admin-user {
       font-size: 12px;
@@ -229,7 +266,7 @@ export default {
     border-radius: 12px;
     margin-bottom: 150px;
     overflow-x: scroll;
-    
+
     tr,
     td,
     th {

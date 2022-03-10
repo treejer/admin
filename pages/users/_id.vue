@@ -23,7 +23,7 @@ export default {
     async getUser() {
       let self = this;
       self.user = await self.$axios.$get(
-        `${process.env.API_URL}/users/${self.$route.params.id}`,
+        `${process.env.API_URL}/admin/users/${self.$route.params.id}`,
       );
       console.log(self.user,"self.user is here")
     },
