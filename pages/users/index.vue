@@ -153,7 +153,7 @@ export default {
       await this.$axios
         .$get(`${process.env.API_URL}/admin/users?filters={}`)
         .then((res) => {
-          if (res.statusCode && res.statusCode === 400) {
+          if (res.statusCode) {
             self.$bvToast.toast(res.code, {
               variant: "danger",
               title: "Forbidden",
@@ -197,7 +197,7 @@ export default {
         .then((res) => {
           console.log(res, "res is here");
 
-          if (res.statusCode && res.statusCode === 400) {
+          if (res.statusCode) {
             self.$bvToast.toast(res.code, {
               variant: "danger",
               title: "Forbidden",
@@ -228,6 +228,7 @@ export default {
           });
         });
     },
+    
   },
 };
 </script>
@@ -283,8 +284,6 @@ export default {
     tr th {
       font-size: 14px;
       line-height: 17px;
-      /* identical to box height */
-
       color: #757575;
     }
     .btn-state-admin {

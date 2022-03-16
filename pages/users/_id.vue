@@ -42,12 +42,24 @@
         "
         v-if="userDetails.user"
       >
-        <img
-          class="edit-button pointer-event"
-          src="~/assets/images/users/edit-button.svg"
-          alt=""
-          @click.prevent="changeProfile()"
-        />
+        <div class="edit-button">
+          <img
+            class="pointer-event"
+            src="~/assets/images/users/edit-button.svg"
+            alt=""
+            @click.prevent="changeProfile()"
+          />
+          <button
+            class="btn-green join-by-admin"
+            @click.prevent="joinByAdmin()"
+          >
+            Planter join by admin
+          </button>
+          <button class="btn-green" @click.prevent="joinByOrganization()">
+            Organization join
+          </button>
+        </div>
+
         <p>
           Email: <span>{{ userDetails.user.email }}</span>
         </p>
@@ -58,7 +70,10 @@
           Lastname: <span>{{ userDetails.user.lastName }}</span>
         </p>
         <p>
-          CreatedAt: <span>{{ userDetails.user.createdAt }}</span>
+          CreatedAt:
+          <span>{{
+            $moment(userDetails.user.createdAt).strftime("%Y-%m-%d %I:%M")
+          }}</span>
         </p>
         <p>Mobile:{{ userDetails.user.mobile }}</p>
         <p>
@@ -67,6 +82,12 @@
         <p>
           Password: <span>{{ userDetails.user.password }}</span>
         </p>
+        <img
+          v-if="userDetails.file"
+          class="img-fluid"
+          :src="`${baseUrl}/files/${userDetails.file.filename}`"
+          :alt="userDetails.file.filename"
+        />
       </div>
     </div>
   </div>
@@ -77,12 +98,13 @@ export default {
   data() {
     return {
       userDetails: "",
-
+      baseUrl: process.env.BASE_URL,
       icon: process.env.GRAVATAR,
     };
   },
   async created() {
     await this.getUser();
+    await this.getApplications();
     console.log(process.env.GRAVATAR, ".env.gravatar is here");
   },
   methods: {
@@ -94,12 +116,27 @@ export default {
           console.log(result, "result is here");
           self.userDetails = result;
         })
-        .catch((err) => {});
+        .catch((err) => {
+          console.log(err, "err is here");
+        });
       console.log(self.userDetails, "self.user is here");
     },
-    changeProfile(){
-      
-    }
+    async getApplications() {
+      let self = this;
+      self.$axios
+        .$get(
+          `${process.env.API_URL}/admin/applications?filter={where:{userId:${self.$route.params.id}}}`
+        )
+        .then((res) => {
+          console.log(res, "res is here");
+        })
+        .catch((err) => {
+          console.log(err, "err is here");
+        });
+    },
+    changeProfile() {},
+    joinByAdmin() {},
+    joinByOrganization() {},
   },
 };
 </script>
@@ -138,8 +175,22 @@ export default {
   .user-detail-main {
     .edit-button {
       position: absolute;
-      width: 25px;
       right: 25px;
+      display: flex;
+      flex-direction: column;
+      float: right;
+      img {
+        width: 25px;
+        position: absolute;
+        right: 0;
+      }
+      button {
+        margin-top: 15px;
+        padding: 10px 25px;
+      }
+      .join-by-admin {
+        margin-top: 35px;
+      }
     }
     overflow: hidden;
     background: #ffffff;
