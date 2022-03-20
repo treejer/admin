@@ -53,7 +53,7 @@ export default {
     async checkRouteSidbar() {
       let hist = this.$route.path;
       switch (hist) {
-        case "/users" :
+        case "/users" || "/users/*" || "/users/":
           this.$store.commit("SET_SIDEBAR_INDEX", 1);
           break;
         case "/forests":

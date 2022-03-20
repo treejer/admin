@@ -1,8 +1,8 @@
 <template>
-  <div class="container user-page-details" v-if="userDetails">
-    <div class="row">
+  <div class="container user-page-details" >
+    <div class="row" v-if="userDetails">
       <div class="col-12 position-relative">
-        <div
+        <div v-if="userDetails.user.publicAddress"
           class="banner"
           :style="`background-image:url(${icon}${userDetails.user.publicAddress})`"
         ></div>
@@ -58,6 +58,13 @@
           <button class="btn-green" @click.prevent="joinByOrganization()">
             Organization join
           </button>
+          <button
+            @click.prevent="sendVerifyAndReject(userDetails)"
+            class="btn-state-admin"
+            :class="user.user.isVerified ? 'btn-green' : 'btn-warning'"
+          >
+            {{ user.user.isVerified ? "Verified" : "Pending" }}
+          </button>
         </div>
 
         <p>
@@ -97,12 +104,12 @@ export default {
   layout: "dashboard",
   data() {
     return {
-      userDetails: "",
+      userDetails: null,
       baseUrl: process.env.BASE_URL,
       icon: process.env.GRAVATAR,
     };
   },
-  async created() {
+  async mounted() {
     await this.getUser();
     await this.getApplications();
     console.log(process.env.GRAVATAR, ".env.gravatar is here");
@@ -113,8 +120,8 @@ export default {
       await self.$axios
         .$get(`${process.env.API_URL}/admin/users/${self.$route.params.id}`)
         .then((result) => {
-          console.log(result, "result is here");
           self.userDetails = result;
+          console.log(result, "result is here");
         })
         .catch((err) => {
           console.log(err, "err is here");
@@ -132,6 +139,61 @@ export default {
         })
         .catch((err) => {
           console.log(err, "err is here");
+        });
+    },
+    async sendVerifyAndReject(user) {
+      if (!confirm("Do you really want to change status?")) {
+        return;
+      }
+
+      let self = this;
+
+      const path = user.user.isVerified ? "reject" : "verify";
+
+      await self.$axios
+        .$patch(
+          `${process.env.API_URL}/admin/${path}?userid=${user.user._id}`,
+          {},
+          {
+            headers: {
+              Accept: "application/json",
+              "x-auth-userid": self.$cookies.get("userId"),
+              "x-auth-logintoken": self.$cookies.get("loginToken"),
+            },
+          }
+        )
+        .then((res) => {
+          console.log(res, "res is here");
+
+          if (res.statusCode) {
+            self.$bvToast.toast(res.code, {
+              variant: "danger",
+              title: "Forbidden",
+              toaster: "b-toaster-bottom-left",
+            });
+          } else {
+            self.$bvToast.toast(
+              `User status successfully changed to ${
+                user.user.isVerified ? "Rejected" : "Verified"
+              }`,
+              {
+                variant: "success",
+                title: "Update status successful",
+                toaster: "b-toaster-bottom-left",
+              }
+            );
+
+            self.getUsers();
+          }
+        })
+        .catch((err) => {
+          console.log(err, "err is here");
+
+          self.$bvToast.toast(err.message, {
+            variant: "danger",
+            title: "Forbidden",
+            toaster: "b-toaster-bottom-left",
+          });
         });
     },
     changeProfile() {},

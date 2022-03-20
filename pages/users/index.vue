@@ -18,7 +18,7 @@
               />
             </div>
           </div>
-          <div class="col-12 col-md-12 p-0">
+          <div class="col-12 col-md-12 mt-4">
             <div class="admin-user-table">
               <table class="table border-0 dir-ltr">
                 <thead>
@@ -37,9 +37,7 @@
                     <th class="pointer-event" scope="col">
                       <i class="pointer-event fas fa-sort-up"></i>CreatedAt
                     </th>
-                    <th class="pointer-event" scope="col">
-                      <i class="pointer-event fas fa-sort-up"></i>Status
-                    </th>
+                   
 
                     <th class="pointer-event d-none d-md-block" scope="col">
                       <i class="pointer-event fas fa-sort-up"></i>Show detail
@@ -72,17 +70,7 @@
                         }}
                       </span>
                     </td>
-                    <td>
-                      <button
-                        @click.prevent="sendVerifyAndReject(user)"
-                        class="btn-state-admin"
-                        :class="
-                          user.user.isVerified ? 'btn-green' : 'btn-warning'
-                        "
-                      >
-                        {{ user.user.isVerified ? "Verified" : "Pending" }}
-                      </button>
-                    </td>
+                  
                     <td class="d-none d-md-block">
                       <nuxt-link :to="`/users/${user.user._id}`">
                         <button class="btn-state-admin btn-green">Info</button>
@@ -173,61 +161,7 @@ export default {
         })
         .finally(() => (self.loading = false));
     },
-    async sendVerifyAndReject(user) {
-      if (!confirm("Do you really want to change status?")) {
-        return;
-      }
-
-      let self = this;
-
-      const path = user.user.isVerified ? "reject" : "verify";
-
-      await self.$axios
-        .$patch(
-          `${process.env.API_URL}/admin/${path}?userid=${user.user._id}`,
-          {},
-          {
-            headers: {
-              Accept: "application/json",
-              "x-auth-userid": this.$cookies.get("userId"),
-              "x-auth-logintoken": this.$cookies.get("loginToken"),
-            },
-          }
-        )
-        .then((res) => {
-          console.log(res, "res is here");
-
-          if (res.statusCode) {
-            self.$bvToast.toast(res.code, {
-              variant: "danger",
-              title: "Forbidden",
-              toaster: "b-toaster-bottom-left",
-            });
-          } else {
-            this.$bvToast.toast(
-              `User status successfully changed to ${
-                user.user.isVerified ? "Rejected" : "Verified"
-              }`,
-              {
-                variant: "success",
-                title: "Update status successful",
-                toaster: "b-toaster-bottom-left",
-              }
-            );
-
-            this.getUsers();
-          }
-        })
-        .catch((err) => {
-          console.log(err, "err is here");
-
-          self.$bvToast.toast(err.message, {
-            variant: "danger",
-            title: "Forbidden",
-            toaster: "b-toaster-bottom-left",
-          });
-        });
-    },
+  
     
   },
 };
@@ -246,7 +180,7 @@ export default {
   .search-icon {
     position: absolute;
     right: 50px;
-    top: 12px;
+    top: 9px;
   }
   @media (max-width: 767px) {
     .search-admin-user-box {
