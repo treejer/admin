@@ -99,6 +99,9 @@
 </template>
 
 <script>
+import AccessRestrictionABI from  '~/static/abis/AccessRestriction.json';
+
+
 export default {
   layout: "dashboard",
   data() {
@@ -228,7 +231,100 @@ export default {
         });
     },
     changeProfile() {},
-    joinByAdmin() {},
+    async joinByAdmin() {
+      let nonce = 2;
+
+      const AccessRestrictionContract = new this.$web3.eth.Contract(AccessRestrictionABI, process.env.CONTRACT_AR_ADDRESS);
+
+      console.log(AccessRestrictionContract, "AccessRestrictionContract is here");
+
+      const tx = AccessRestrictionContract.methods.grantRole(this.$web3.utils.soliditySha3("PLANTER_ROLE"), this.userDetails.user.publicAddress);
+      const data = tx.encodeABI();
+
+      console.log(data, "data is here");
+
+      console.log(AccessRestrictionContract._address, "AccessRestrictionContract._address")
+
+      const safeTransaction = await this.$safeSdk.createTransaction({
+        to: AccessRestrictionContract._address,
+        value: 0,
+        data: data,
+        nonce: nonce
+      })
+      const txHash = await this.$safeSdk.getTransactionHash(safeTransaction)
+
+      console.log(txHash, "txHash is here");
+
+      const signatureData = await this.$safeSdk.signTransactionHash(txHash)
+
+      console.log(signatureData, "signature is here");
+
+      const { signer: sender, data: signature } = signatureData;
+  //       const { signer: sender, data: signature } = signatureData;
+
+  // // // console.log("safeTransaction", safeTransaction);
+
+  const postData = {
+    ...safeTransaction.data,
+    contractTransactionHash: txHash,
+    sender: this.$cookies.get("account"),
+    signature,
+    nonce: nonce,
+    origin: "Submit Data",
+  };
+
+      // console.log("safeTransaction", safeTransaction);
+
+      // const postData = {
+      //   ...safeTransaction.data,
+      //   contractTransactionHash: txHash,
+      //   sender: this.$cookies.get("account"),
+      //   signature: signature,
+      //   origin: "Submit Data",
+      // };
+
+      console.log(postData, "postData is here");
+
+      const TRX_SERVICE_URL = `https://safe-transaction.rinkeby.gnosis.io/api/v1/safes/${process.env.GNOSIS_SAFE_ADDRESS}/multisig-transactions/`;
+
+      try {
+        await this.$axios.post(TRX_SERVICE_URL, postData, {
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Headers": "*",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "*",
+          }
+        });
+        console.log("Submitted Transaction");
+        // console.log(
+        //   `https://polygon.gnosis-safe.io/app/#/safes/${targetAddress}/transactions`
+        // );
+      } catch (e) {
+
+        console.log(e, "e is here");
+
+        // console.error(e.response.status);
+        // console.error(e.response.statusText);
+        // console.error(e.response.data);
+      }
+
+
+
+
+
+      // const approveTxResponse = await this.$safeSdk.approveTransactionHash(txHash)
+      // console.log(approveTxResponse, "approveTxResponse is here");
+      // await approveTxResponse.transactionResponse?.wait()
+
+
+
+      // const owner1Signature = await this.$safeSdk.signTransaction(safeTransaction)
+
+
+
+    },
     joinByOrganization() {},
   },
 };
