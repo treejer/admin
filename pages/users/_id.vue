@@ -33,6 +33,7 @@
       <div
         class="
           mt-5
+          mb-5
           font-weight-bolder
           param-gray-two
           user-detail-main
@@ -40,7 +41,6 @@
           over-flow-hidden
           w-100
         "
-        v-if="userDetails.user"
       >
         <div class="edit-button">
           <img
@@ -58,40 +58,69 @@
           <button class="btn-green" @click.prevent="joinByOrganization()">
             Organization join
           </button>
+          <button class="btn-green" @click.prevent="sendVerifyAndReject()">
+            {{ userDetails.user.isVerified ? "Reject" : "Verify" }}
+          </button>
         </div>
 
-        <p>
-          Email: <span>{{ userDetails.user.email }}</span>
-        </p>
-        <p>
-          Firstname: <span>{{ userDetails.user.firstName }}</span>
-        </p>
-        <p>
-          Lastname: <span>{{ userDetails.user.lastName }}</span>
-        </p>
-        <p>
-          CreatedAt:
-          <span>{{
-            $moment(userDetails.user.createdAt).strftime("%Y-%m-%d %I:%M")
-          }}</span>
-        </p>
-        <p>Mobile:{{ userDetails.user.mobile }}</p>
-        <p>
-          Public address: <span>{{ userDetails.user.publicAddress }}</span>
-        </p>
-        <p>
-          Password: <span>{{ userDetails.user.password }}</span>
-        </p>
+
+        <h2>
+          User Info
+        </h2>
+
+
+<p>_id: <span>{{ userDetails.user._id }}</span> </p>
+<p>firstName: <span>{{ userDetails.user.firstName }}</span> </p>
+<p>lastName: <span>{{ userDetails.user.lastName }}</span> </p>
+<p>createdAt: <span>{{  $moment(userDetails.user.createdAt).strftime("%Y-%m-%d %I:%M") }}</span> </p>
+<p>email: <span>{{ userDetails.user.email }}</span> </p>
+<p>emailToken: <span>{{ userDetails.user.emailToken }}</span> </p>
+<p>emailVerifiedAt: <span>{{ userDetails.user.emailVerifiedAt ? $moment(userDetails.user.emailVerifiedAt).strftime("%Y-%m-%d %I:%M") : '-' }}</span> </p>
+<p>isAdmin: <span>{{ userDetails.user.isAdmin }}</span> </p>
+<p>isVerified: <span>{{ userDetails.user.isVerified }}</span> </p>
+<p>lastLoginAt: <span>{{ userDetails.user.lastLoginAt }}</span> </p>
+<p>mobile: <span>{{ userDetails.user.mobile }}</span> </p>
+<p>mobileCode: <span>{{ userDetails.user.mobileCode }}</span> </p>
+<p>mobileCodeRequestedAt: <span>{{ userDetails.user.mobileCodeRequestedAt }}</span> </p>
+<p>mobileCodeRequestsCountForToday: <span>{{ userDetails.user.mobileCodeRequestsCountForToday }}</span> </p>
+<p>mobileCountry: <span>{{ userDetails.user.mobileCountry }}</span> </p>
+<p>mobileVerifiedAt: <span>{{ userDetails.user.mobileVerifiedAt }}</span> </p>
+<p>publicAddress: <span>{{ userDetails.user.publicAddress }}</span> </p>
+<p>signedAt: <span>{{ userDetails.user.signedAt }}</span> </p>
         
 
-        <div>
+        <p v-if="userDetails.file">
+        
           {{ userDetails.file.filename }}
 
           <button class="btn-green" @click.prevent="downloadFile()">
             Download File 
           </button>
         
-        </div>
+        </p>
+
+
+        <h2>
+          Application Info
+        </h2>
+<p>latitude: <span>  {{ userDetails.application.latitude }}</span></p>
+<p>longitude: <span>  {{ userDetails.application.longitude }}</span></p>
+
+<p>
+
+  <a
+    :href="`https://www.google.com/maps/search/?api=1&query=${ userDetails.application.latitude },${ userDetails.application.longitude }`"
+    target="_blank"
+    rel="noopener noreferrer"> View on googlemap </a>
+
+</p>
+
+<p>organizationAddress: <span>  {{ userDetails.application.organizationAddress }}</span></p>
+<p>referrer: <span>  {{ userDetails.application.referrer }}</span></p>
+<p>status: <span>  {{ userDetails.application.status }}</span></p>
+<p>type: <span>  {{ userDetails.application.type }}</span></p>
+
+
 
       </div>
     </div>
@@ -172,18 +201,18 @@ export default {
           console.log(err, "err is here");
         });
     },
-    async sendVerifyAndReject(user) {
+    async sendVerifyAndReject() {
       if (!confirm("Do you really want to change status?")) {
         return;
       }
 
       let self = this;
 
-      const path = user.user.isVerified ? "reject" : "verify";
+      const path = this.userDetails.user.isVerified ? "reject" : "verify";
 
       await self.$axios
         .$patch(
-          `${process.env.API_URL}/admin/${path}?userid=${user.user._id}`,
+          `${process.env.API_URL}/admin/${path}?userid=${this.userDetails.user._id}`,
           {},
           {
             headers: {
@@ -205,7 +234,7 @@ export default {
           } else {
             self.$bvToast.toast(
               `User status successfully changed to ${
-                user.user.isVerified ? "Rejected" : "Verified"
+                this.userDetails.user.isVerified ? "Rejected" : "Verified"
               }`,
               {
                 variant: "success",
@@ -214,7 +243,7 @@ export default {
               }
             );
 
-            self.getUsers();
+            self.getUser();
           }
         })
         .catch((err) => {
