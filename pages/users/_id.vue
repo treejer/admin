@@ -82,12 +82,17 @@
         <p>
           Password: <span>{{ userDetails.user.password }}</span>
         </p>
-        <img
-          v-if="userDetails.file"
-          class="img-fluid"
-          :src="`${baseUrl}/files/${userDetails.file.filename}`"
-          :alt="userDetails.file.filename"
-        />
+        
+
+        <div>
+          {{ userDetails.file.filename }}
+
+          <button class="btn-green" @click.prevent="downloadFile()">
+            Download File 
+          </button>
+        
+        </div>
+
       </div>
     </div>
   </div>
@@ -99,7 +104,7 @@ export default {
   data() {
     return {
       userDetails: null,
-      baseUrl: process.env.BASE_URL,
+      apiURL: process.env.API_URL,
       avatarURL: null
     };
   },
@@ -123,6 +128,37 @@ export default {
         });
       console.log(self.userDetails, "self.user is here");
     },
+    async downloadFile() {
+
+      if(!this.userDetails.file && !this.userDetails.file.filename  ) {
+        return;
+      }
+
+      let self = this;
+      await self.$axios
+        .$get(`${process.env.API_URL}/files/${this.userDetails.file.filename }`,
+          {
+            responseType: 'blob'   
+          }
+        )
+        .then((downloadFile) => {
+
+          let filename = self.userDetails.user.firstName + " " + self.userDetails.user.lastName + " - " + self.userDetails.file.filename;
+
+          let url = window.URL.createObjectURL(new Blob([downloadFile]));
+          let link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download',  filename);
+          document.body.appendChild(link);
+          link.click();
+
+
+        })
+        .catch((err) => {
+          console.log(err, "err is here");
+        });
+    },
+
     async getApplications() {
       let self = this;
       self.$axios
