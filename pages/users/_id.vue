@@ -1,10 +1,10 @@
 <template>
-  <div class="container user-page-details" >
-    <div class="row" v-if="userDetails">
+  <div class="container user-page-details" v-if="userDetails">
+    <div class="row">
       <div class="col-12 position-relative">
-        <div v-if="userDetails.user.publicAddress"
+        <div
           class="banner"
-          :style="`background-image:url(${icon}${userDetails.user.publicAddress})`"
+          :style="`background-image:url(${ $avatarByWallet(userDetails.user.publicAddress) })`"
         ></div>
 
         <div class="box-banner-details">
@@ -12,13 +12,13 @@
             <div class="col-md-3 user-img">
               <img
                 class="img-rounded"
-                :src="`${icon}${userDetails.user.publicAddress}`"
+                :src="`${ $avatarByWallet(userDetails.user.publicAddress) }`"
                 :alt="
                   userDetails.user.email
                     ? userDetails.user.email
                     : userDetails.user.firstName
                 "
-              />
+            />
               <h1 class="title-md tr-gray-nine mt-2 font-weight-bolder">
                 {{
                   userDetails.user.firstName
@@ -58,13 +58,6 @@
           <button class="btn-green" @click.prevent="joinByOrganization()">
             Organization join
           </button>
-          <button
-            @click.prevent="sendVerifyAndReject(userDetails)"
-            class="btn-state-admin"
-            :class="user.user.isVerified ? 'btn-green' : 'btn-warning'"
-          >
-            {{ user.user.isVerified ? "Verified" : "Pending" }}
-          </button>
         </div>
 
         <p>
@@ -99,6 +92,7 @@
     </div>
   </div>
 </template>
+
 <script>
 export default {
   layout: "dashboard",
@@ -106,13 +100,13 @@ export default {
     return {
       userDetails: null,
       baseUrl: process.env.BASE_URL,
-      icon: process.env.GRAVATAR,
+      avatarURL: null
     };
   },
   async mounted() {
     await this.getUser();
-    await this.getApplications();
-    console.log(process.env.GRAVATAR, ".env.gravatar is here");
+    // await this.getApplications();
+
   },
   methods: {
     async getUser() {
@@ -120,8 +114,9 @@ export default {
       await self.$axios
         .$get(`${process.env.API_URL}/admin/users/${self.$route.params.id}`)
         .then((result) => {
-          self.userDetails = result;
           console.log(result, "result is here");
+
+          self.userDetails = result;
         })
         .catch((err) => {
           console.log(err, "err is here");

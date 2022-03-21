@@ -255,7 +255,7 @@ export default {
     },
     async changeEthereum() {
       let self = this;
-      self.icon = `${process.env.gravatar}${this.$cookies.get("account")}`;
+      self.icon = `${process.env.avatarURL}${this.$cookies.get("account")}`;
       // await ethereum.on("chainChanged", () => {
       //   document.location.reload();
       // });
