@@ -59,18 +59,20 @@ export const actions = {
   },
   async metaMask() {
 
-    let self = this;
-    self.$cookies.set("walletName", "metamask");
+    this.$cookies.set("walletName", "metamask");
 
     await ethereum.enable();
-    const accounts = await window.ethereum.request({
-      method: "eth_requestAccounts",
-    });
-    const account = accounts[0];
-    self.$cookies.set("account", account);
-    if (accounts) {
-     
-        window.location.reload();
+
+    let firstAccount = null;
+    await this.$web3.eth.getAccounts().then(e => { 
+      firstAccount = e[0];
+    }) 
+
+    console.log(firstAccount, "account")
+
+    this.$cookies.set("account", firstAccount);
+    if (firstAccount) {
+      window.location.reload();
     }
   },
   
@@ -88,7 +90,7 @@ export const actions = {
     const connector = await wc.connect();
     const account = connector._accounts[0];
     console.log(account, connector, "connector is ghere");
-    self.$cookies.set("account", account.toLowerCase());
+    self.$cookies.set("account", account);
     window.location.reload;
 
   },
@@ -112,6 +114,8 @@ export const actions = {
 
     self.$cookies.set("walletName", null);
     self.$cookies.set("account", null);
+    self.$cookies.set("loginToken", null);
+    self.$cookies.set("userId", null);
     commit("SET_USER", null);
     commit("SET_WALLET", null);
   },

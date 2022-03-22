@@ -1,8 +1,6 @@
 import Web3 from 'web3'
 import WalletConnectProvider from "@walletconnect/web3-provider";
 
-import Web3Adapter from '@gnosis.pm/safe-web3-lib'
-import Safe from '@gnosis.pm/safe-core-sdk'
 
 
 export default async ({ app }, inject) => {
@@ -23,20 +21,10 @@ export default async ({ app }, inject) => {
     }
     
 
-    //create gnosis safe instance
-    const ethAdapterOwner = new Web3Adapter({
-        web3: instance,
-        signerAddress: app.$cookies.get("account"),
-    });
-
-    const safeSdk = await Safe.create({
-        ethAdapter: ethAdapterOwner,
-        safeAddress: process.env.GNOSIS_SAFE_ADDRESS,
-    });
+   
 
 
     inject('web3', instance)
-    inject('safeSdk', safeSdk)
     // inject('treeFactory', new instance.eth.Contract(TreeFactory.abi, process.env.contractTreeFactoryAddress))
   
 }

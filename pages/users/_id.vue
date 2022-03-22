@@ -49,18 +49,116 @@
             alt=""
             @click.prevent="changeProfile()"
           />
-          <button
-            class="btn-green join-by-admin"
-            @click.prevent="joinByAdmin()"
-          >
-            Planter join by admin
-          </button>
-          <button class="btn-green" @click.prevent="joinByOrganization()">
-            Organization join
-          </button>
-          <button class="btn-green" @click.prevent="sendVerifyAndReject()">
-            {{ userDetails.user.isVerified ? "Reject" : "Verify" }}
-          </button>
+
+
+            
+          <b-button class="btn-green" v-b-modal.modal-1 v-if="txData">Show Verify Box</b-button>
+
+          <b-modal id="modal-1" hide-footer title="Verification Detail" v-if="txData">
+            <p>
+            Role: (Byte32)
+            <input
+              type="text"
+              v-model="txData.roleValue"
+              >
+            </p>
+
+            <p>
+            publicAddress
+            <input
+              type="text"
+              v-model="txData.publicAddress"
+              >
+            </p>
+
+            <p>
+            longitude
+            <input
+              type="text"
+              v-model="txData.longitude"
+              >
+            </p>
+
+            <p>
+            latitude
+            <input
+              type="text"
+              v-model="txData.latitude"
+              >
+            </p>
+
+            <p>
+            organizationAddress
+            <input
+              type="text"
+              v-model="txData.organizationAddress"
+              >
+            </p>
+
+            <p>
+            referrer
+            <input
+              type="text"
+              v-model="txData.referrer"
+              >
+            </p>
+
+            <p>
+            countryCode ({{ userDetails.user.mobileCountry }})  <a target="_blank" href="https://www.iban.com/country-codes">(check here)</a>
+            <input
+              type="text"
+              v-model="txData.countryCode"
+              >
+            </p>
+
+
+            <p>
+            type
+
+
+              <select v-model="txData.type">
+                <option value="1">Individual</option>
+                <option value="2">Organization</option>
+                <option value="3">Memeber of organization</option>
+              </select>
+
+
+            </p>
+
+
+            <p>
+            capacity
+            <input
+              type="text"
+              v-model="txData.capacity"
+              >
+            </p>
+
+
+            <p>
+            roleGranted: {{ roleGranted }}
+            </p>
+
+            <p>
+            planterStatus: {{ planterStatus }}
+            </p>
+
+            <button v-if="this.roleGranted == false && this.planterStatus == 0"
+              class="btn-green join-by-admin"
+              @click.prevent="joinByAdmin()"
+            >
+              Join Planter onchain
+            </button>
+
+            <button :class="userDetails.user.isVerified ? 'btn-warning' :  'btn-green'" @click.prevent="sendVerifyAndReject()">
+              {{ userDetails.user.isVerified ? "Reject" : "Verify" }} Offchain
+            </button>
+
+
+          </b-modal>
+
+
+          
         </div>
 
 
@@ -72,6 +170,8 @@
 <p>_id: <span>{{ userDetails.user._id }}</span> </p>
 <p>firstName: <span>{{ userDetails.user.firstName }}</span> </p>
 <p>lastName: <span>{{ userDetails.user.lastName }}</span> </p>
+<p>publicAddress: <span>{{ userDetails.user.publicAddress }}</span> </p>
+
 <p>createdAt: <span>{{  $moment(userDetails.user.createdAt).strftime("%Y-%m-%d %I:%M") }}</span> </p>
 <p>email: <span>{{ userDetails.user.email }}</span> </p>
 <p>emailToken: <span>{{ userDetails.user.emailToken }}</span> </p>
@@ -85,7 +185,6 @@
 <p>mobileCodeRequestsCountForToday: <span>{{ userDetails.user.mobileCodeRequestsCountForToday }}</span> </p>
 <p>mobileCountry: <span>{{ userDetails.user.mobileCountry }}</span> </p>
 <p>mobileVerifiedAt: <span>{{ userDetails.user.mobileVerifiedAt }}</span> </p>
-<p>publicAddress: <span>{{ userDetails.user.publicAddress }}</span> </p>
 <p>signedAt: <span>{{ userDetails.user.signedAt }}</span> </p>
         
 
@@ -100,7 +199,9 @@
         </p>
 
 
-        <h2>
+<div v-if="userDetails.application">
+
+<h2>
           Application Info
         </h2>
 <p>latitude: <span>  {{ userDetails.application.latitude }}</span></p>
@@ -120,7 +221,12 @@
 <p>status: <span>  {{ userDetails.application.status }}</span></p>
 <p>type: <span>  {{ userDetails.application.type }}</span></p>
 
+</div>
 
+        
+
+
+          
 
       </div>
     </div>
@@ -129,23 +235,39 @@
 
 <script>
 import AccessRestrictionABI from  '~/static/abis/AccessRestriction.json';
+import PlanterABI from  '~/static/abis/Planter.json';
+import countries from  '~/static/data/countries.min.json';
 
+import Web3Adapter from '@gnosis.pm/safe-web3-lib'
+import Safe from '@gnosis.pm/safe-core-sdk'
+import SafeServiceClient from '@gnosis.pm/safe-service-client'
 
 export default {
   layout: "dashboard",
   data() {
     return {
       userDetails: null,
-      apiURL: process.env.API_URL,
-      avatarURL: null
+      txData: null,
+      AccessRestrictionContract: null,
+      PlanterContract: null,
+      roleGranted: false,
+      planterStatus: false
     };
   },
   async mounted() {
     await this.getUser();
-    // await this.getApplications();
+
+    if(this.userDetails && this.userDetails.application){     
+      await this.setNeededContracts();
+      await this.setContractsData();
+    }
+
+
+
 
   },
   methods: {
+    
     async getUser() {
       let self = this;
       await self.$axios
@@ -154,6 +276,41 @@ export default {
           console.log(result, "result is here");
 
           self.userDetails = result;
+
+
+          // set txData
+          if(result.application) {
+            
+            self.txData = {
+              roleValue: self.$web3.utils.soliditySha3("PLANTER_ROLE"),
+              publicAddress: result.user.publicAddress,
+              longitude: Math.trunc(result.application.longitude * Math.pow(10, 6)),
+              latitude: Math.trunc(result.application.latitude * Math.pow(10, 6)),
+              organizationAddress: result.application.organizationAddress ? result.application.organizationAddress : process.env.zeroAddress,
+              referrer: result.application.referrer ? result.application.referrer : process.env.zeroAddress,
+              countryCode: null,
+              type: result.application.type,
+              capacity: result.application.type ==  2 ? 500 : 100
+            }
+
+            if(result.application.organizationAddress != null && result.application.organizationAddress != "" && result.application.organizationAddress != process.env.zeroAddress) {
+              self.txData.type = 3;
+            }
+
+
+            let foundCountry = countries.find(function(country, index) {
+              if(country.iso == result.user.mobileCountry) {
+                return true;
+              }
+            });
+
+            if(foundCountry) {
+              self.txData.countryCode = foundCountry.numcode;
+            }
+          }
+
+          
+
         })
         .catch((err) => {
           console.log(err, "err is here");
@@ -190,21 +347,17 @@ export default {
           console.log(err, "err is here");
         });
     },
-
-    async getApplications() {
-      let self = this;
-      self.$axios
-        .$get(
-          `${process.env.API_URL}/admin/applications?filter={where:{userId:${self.$route.params.id}}}`
-        )
-        .then((res) => {
-          console.log(res, "res is here");
-        })
-        .catch((err) => {
-          console.log(err, "err is here");
-        });
-    },
     async sendVerifyAndReject() {
+
+      if(this.roleGranted == false && this.planterStatus != 1) {
+        this.$bvToast.toast("This planter not exist on planter contract", {
+          variant: "danger",
+          title: "Not planter",
+          toaster: "b-toaster-bottom-left",
+        });
+        return;
+      }
+
       if (!confirm("Do you really want to change status?")) {
         return;
       }
@@ -260,101 +413,203 @@ export default {
         });
     },
     changeProfile() {},
-    async joinByAdmin() {
-      let nonce = 2;
 
-      const AccessRestrictionContract = new this.$web3.eth.Contract(AccessRestrictionABI, process.env.CONTRACT_AR_ADDRESS);
+    async setNeededContracts(){
+      this.AccessRestrictionContract = new this.$web3.eth.Contract(AccessRestrictionABI, process.env.CONTRACT_AR_ADDRESS);
+      this.PlanterContract = new this.$web3.eth.Contract(PlanterABI, process.env.CONTRACT_PLANTER_ADDRESS);
+    },
+    async setContractsData(){
 
-      console.log(AccessRestrictionContract, "AccessRestrictionContract is here");
+      let self = this;
 
-      const tx = AccessRestrictionContract.methods.grantRole(this.$web3.utils.soliditySha3("PLANTER_ROLE"), this.userDetails.user.publicAddress);
-      const data = tx.encodeABI();
-
-      console.log(data, "data is here");
-
-      console.log(AccessRestrictionContract._address, "AccessRestrictionContract._address")
-
-      const safeTransaction = await this.$safeSdk.createTransaction({
-        to: AccessRestrictionContract._address,
-        value: 0,
-        data: data,
-        nonce: nonce
-      })
-      const txHash = await this.$safeSdk.getTransactionHash(safeTransaction)
-
-      console.log(txHash, "txHash is here");
-
-      const signatureData = await this.$safeSdk.signTransactionHash(txHash)
-
-      console.log(signatureData, "signature is here");
-
-      const { signer: sender, data: signature } = signatureData;
-  //       const { signer: sender, data: signature } = signatureData;
-
-  // // // console.log("safeTransaction", safeTransaction);
-
-  const postData = {
-    ...safeTransaction.data,
-    contractTransactionHash: txHash,
-    sender: this.$cookies.get("account"),
-    signature,
-    nonce: nonce,
-    origin: "Submit Data",
-  };
-
-      // console.log("safeTransaction", safeTransaction);
-
-      // const postData = {
-      //   ...safeTransaction.data,
-      //   contractTransactionHash: txHash,
-      //   sender: this.$cookies.get("account"),
-      //   signature: signature,
-      //   origin: "Submit Data",
-      // };
-
-      console.log(postData, "postData is here");
-
-      const TRX_SERVICE_URL = `https://safe-transaction.rinkeby.gnosis.io/api/v1/safes/${process.env.GNOSIS_SAFE_ADDRESS}/multisig-transactions/`;
-
-      try {
-        await this.$axios.post(TRX_SERVICE_URL, postData, {
-          headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Headers": "*",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "*",
-          }
+      await this.AccessRestrictionContract.methods
+        .hasRole(this.txData.roleValue, this.txData.publicAddress)
+        .call().then(function(result) {
+          console.log(result, "hasRole result is here");
+          self.roleGranted = result;
         });
-        console.log("Submitted Transaction");
-        // console.log(
-        //   `https://polygon.gnosis-safe.io/app/#/safes/${targetAddress}/transactions`
-        // );
-      } catch (e) {
-
-        console.log(e, "e is here");
-
-        // console.error(e.response.status);
-        // console.error(e.response.statusText);
-        // console.error(e.response.data);
-      }
 
 
-
-
-
-      // const approveTxResponse = await this.$safeSdk.approveTransactionHash(txHash)
-      // console.log(approveTxResponse, "approveTxResponse is here");
-      // await approveTxResponse.transactionResponse?.wait()
-
-
-
-      // const owner1Signature = await this.$safeSdk.signTransaction(safeTransaction)
-
+      await this.PlanterContract.methods
+        .planters(this.txData.publicAddress)
+        .call().then(function(result) {
+          console.log(result, "getPlanter result is here");
+          self.planterStatus = result.status;
+        });
 
 
     },
-    joinByOrganization() {},
+
+    async joinByAdmin() {
+      console.log("joinByAdmin");
+
+      console.log(this.txData, "this.txData");
+      
+      if(this.roleGranted && this.planterStatus == 1) {
+        this.$bvToast.toast("this planter already is planter", {
+          variant: "danger",
+          title: "Already planter",
+          toaster: "b-toaster-bottom-left",
+        });
+        return;
+      }
+
+
+      if (!confirm("Are you sure?")) {
+        return;
+      }
+
+      
+      let safeAddress = process.env.GNOSIS_SAFE_ADDRESS;
+      let safeURL = process.env.GNOSIS_SAFE_URL;
+
+       //create gnosis safe instance
+      const ethAdapterOwner = new Web3Adapter({
+          web3: this.$web3,
+          signerAddress: this.$cookies.get("account"),
+      });
+
+      const safeSdk = await Safe.create({
+          ethAdapter: ethAdapterOwner,
+          safeAddress: safeAddress,
+      });
+
+      const safeService = new SafeServiceClient(process.env.GNOSIS_SAFE_TX_URL);
+
+
+
+      const tx = this.AccessRestrictionContract.methods.grantRole(this.txData.roleValue, this.txData.publicAddress);
+      const data = tx.encodeABI();
+
+
+
+      let txPlanter;
+      if(this.txData.type == 2) {
+        txPlanter = this.PlanterContract.methods.joinOrganization(
+          this.txData.publicAddress,
+          this.txData.longitude,
+          this.txData.latitude,
+          this.txData.countryCode,
+          this.txData.capacity,
+          this.txData.referrer
+        );
+      } else {
+
+          if(this.txData.type == 3 && ( this.txData.organizationAddress == process.env.zeroAddress  || this.txData.organizationAddress == "")) {
+            this.$bvToast.toast("Please select organization", {
+              variant: "danger",
+              title: "Validation error",
+              toaster: "b-toaster-bottom-left",
+            });
+            return;
+          }
+
+
+          if(this.txData.type == 1 && this.txData.organizationAddress != process.env.zeroAddress ) {
+            this.$bvToast.toast("Organization must be zero Address", {
+              variant: "danger",
+              title: "Validation error",
+              toaster: "b-toaster-bottom-left",
+            });
+            return;
+          }
+
+          txPlanter = this.PlanterContract.methods.joinByAdmin(
+            this.txData.publicAddress,
+            this.txData.type,
+            this.txData.longitude,
+            this.txData.latitude,
+            this.txData.countryCode,
+            this.txData.referrer,
+            this.txData.organizationAddress
+          );
+      }
+
+      console.log(txPlanter, "txPlanter");
+
+      const dataPlanter = txPlanter.encodeABI();
+      
+
+      let transactions = [
+        {
+          to: this.AccessRestrictionContract._address,
+          value: 0,
+          data: data
+        },
+        {
+          to: this.PlanterContract._address,
+          value: 0,
+          data: dataPlanter
+        }
+      ];
+
+      const nextNonce = await safeService.getNextNonce(safeAddress)
+      const options = {
+        nonce: nextNonce
+      }
+
+      console.log(transactions, "transactions");
+      console.log(options, "options");
+
+      this.$web3.currentProvider.enable();
+
+
+      const safeTransaction = await safeSdk.createTransaction(transactions, options)
+
+      console.log("safeTransaction", safeTransaction);
+
+
+      const txHash = await safeSdk.getTransactionHash(safeTransaction)
+
+      console.log(txHash, "txHash is here");
+
+      const signature = await safeSdk.signTransactionHash(txHash)
+
+      console.log(signature, "signature is here");
+
+
+      
+      try {       
+        await safeService.proposeTransaction(
+          {
+            safeAddress: safeAddress,
+            senderAddress: this.$cookies.get("account"),
+            safeTransaction: safeTransaction,
+            safeTxHash: txHash,
+            origin: 'Safe Core SDK: Safe Service Client'
+          }
+        );
+
+        this.$bvToast.toast('Submitted a batch of '+ transactions.length + " " + this.userDetails.user.firstName + " " + this.userDetails.user.lastName, {
+          variant: "success",
+          title: "Submit successful",
+          toaster: "b-toaster-bottom-left",
+          href: safeURL + safeAddress +  "/transactions/" + txHash,
+          noAutoHide: true
+        });
+
+
+      } catch (err) {
+        console.log(require('util').inspect(err, true, null, true));
+      }
+
+
+      try {
+        const signatureRes = await safeService.confirmTransaction(txHash, signature.data)
+
+        this.$bvToast.toast('Transaction successfully confirmed!', {
+          variant: "success",
+          title: "Confirm Transaction successful",
+          toaster: "b-toaster-bottom-left",
+          href: safeURL + safeAddress +  "/transactions/" + txHash
+        });
+
+
+      } catch (err) {
+        console.log(require('util').inspect(err, true, null, true));
+      }
+
+    },
   },
 };
 </script>

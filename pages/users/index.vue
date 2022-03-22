@@ -37,6 +37,10 @@
                     <th class="pointer-event" scope="col">
                       <i class="pointer-event fas fa-sort-up"></i>CreatedAt
                     </th>
+
+                    <th class="pointer-event" scope="col">
+                      <i class="pointer-event fas fa-sort-up"></i>Status
+                    </th>
                    
 
                     <th class="pointer-event d-none d-md-block" scope="col">
@@ -54,9 +58,12 @@
                       {{ user.user._id }}
                     </td>
                     <td>
-                      <span>{{
-                        user.user.firstName + " " + user.user.lastName
-                      }}</span>
+                      <nuxt-link :to="`/users/${user.user._id}`">
+                        <span>
+                        {{
+                          user.user.firstName + " " + user.user.lastName
+                        }}</span>
+                      </nuxt-link>
                     </td>
                     <td>
                       <span v-coin>{{ user.user.publicAddress }}</span>
@@ -70,6 +77,21 @@
                         }}
                       </span>
                     </td>
+                    
+
+                    <td>
+                      <span
+                        class="btn-state-admin"
+                        :class="
+                          user.user.isVerified ? 'btn-green' : 'btn-warning'
+                        "
+                      >
+                        {{ user.user.isVerified ? "Verified" : "Pending" }}
+                      </span>
+                    </td>
+
+
+
                   
                     <td class="d-none d-md-block">
                       <nuxt-link :to="`/users/${user.user._id}`">

@@ -124,18 +124,27 @@ export default {
       this.$bvModal.show("five");
     },
     async accountChange() {
+
+        let self = this;
+
       if (this.$cookies.get("walletName") === "metamask") {
         let self = this;
         if (process.client) {
-          await window.ethereum.on("accountsChanged", function (accounts) {
-            if (self.account !== accounts[0]) {
-              self.$store.commit("SET_USER", accounts[0]);
-              self.$cookies.set("account", accounts[0]);
-              let routeData = self.$router.resolve({
-                path: `/forest/${accounts[0]}`,
-                params: { id: accounts[0] },
-              });
-              window.open(routeData.href, "_Self");
+          await window.ethereum.on("accountsChanged", async function  (accounts) {
+
+            let firstAccount = null;
+            await self.$web3.eth.getAccounts().then(e => { 
+              firstAccount = e[0];
+            }) 
+
+            console.log(firstAccount, "account")
+
+            this.$cookies.set("account", firstAccount);
+
+            if (self.account !== firstAccount) {
+              self.$store.commit("SET_USER", firstAccount);
+              self.$cookies.set("account", firstAccount);
+              window.location.reload;
             }
           });
         }
