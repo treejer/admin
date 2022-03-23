@@ -105,6 +105,9 @@ export default {
 
 <style lang="scss" scoped>
 .admin-trees {
+  @media (max-width: 768px) {
+    margin-bottom: 100px;
+  }
   .admin-left-side {
     .box {
       min-height: 591px;

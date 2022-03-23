@@ -327,7 +327,7 @@ export default {
       }
     }
   }
-  @media (max-width: 677px) {
+  @media (max-width: 678px) {
     .cards {
       margin: 0 0 15px 0;
     }

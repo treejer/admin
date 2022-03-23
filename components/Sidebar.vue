@@ -1,5 +1,5 @@
 <template>
-  <section class="sidebar pt-4 col-12 col-md-1 col-xl-1">
+  <section class="sidebar pt-4 col-12 col-md-12 col-lg-1 col-xl-1">
     <ul class="nav flex-column">
       <li class="nav-item pointer-event dashboard" @click="changeIndex(0)">
         <nuxt-link to="/">
@@ -94,7 +94,12 @@ export default {
     }
   }
 }
-@media (max-width: 767px) {
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+  
+  /* CSS */
+  
+}
+@media (max-width: 768px) {
   .sidebar {
     min-height: 10vh;
     text-align: center;

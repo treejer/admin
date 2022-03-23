@@ -23,7 +23,7 @@
               <table class="table border-0 dir-ltr">
                 <thead>
                   <tr>
-                    <th scope="col">Number</th>
+                    <th scope="col" class="d-none d-md-block" >Number</th>
 
                     <th scope="col">ID</th>
 
@@ -53,7 +53,7 @@
                     v-for="(user, index) in filterBy(users, searchAdminUsers)"
                     :key="index"
                   >
-                    <td scope="row">{{ index + 1 }}</td>
+                    <td scope="row"  class="d-none d-md-block">{{ index + 1 }}</td>
                     <td scope="row" v-if="user.user._id">
                       {{ user.user._id }}
                     </td>
@@ -204,7 +204,7 @@ export default {
     right: 50px;
     top: 9px;
   }
-  @media (max-width: 767px) {
+  @media (max-width: 768px) {
     .search-admin-user-box {
       width: 100% !important;
     }
