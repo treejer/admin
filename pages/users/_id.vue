@@ -285,7 +285,13 @@ export default {
     async getUser() {
       let self = this;
       await self.$axios
-        .$get(`${process.env.API_URL}/admin/users/${self.$route.params.id}`)
+        .$get(`${process.env.API_URL}/admin/users/${self.$route.params.id}`,{
+            headers: {
+              Accept: "application/json",
+              "x-auth-userid": self.$cookies.get("userId"),
+              "x-auth-logintoken": self.$cookies.get("loginToken"),
+            },
+          })
         .then((result) => {
           console.log(result, "result is here");
 
@@ -345,7 +351,13 @@ export default {
       let self = this;
       await self.$axios
         .$get(
-          `${process.env.API_URL}/files/${this.userDetails.file.filename}`,
+          `${process.env.API_URL}/files/${this.userDetails.file.filename}`,{
+            headers: {
+              Accept: "application/json",
+              "x-auth-userid": self.$cookies.get("userId"),
+              "x-auth-logintoken": self.$cookies.get("loginToken"),
+            },
+          },
           {
             responseType: "blob",
           }

@@ -1,6 +1,6 @@
 <template>
   <div class="container users-admin">
-    <div class="row pl-3 pr-3">
+    <div class="row">
       <div class="users col-12 col-xl-12 col-md-11 offset-md-1 offset-xl-0">
         <div class="row">
           <div class="col-12 py-3 pl-3">
@@ -23,7 +23,7 @@
               <table class="table border-0 dir-ltr">
                 <thead>
                   <tr>
-                    <th scope="col" class="d-none d-md-block" >Number</th>
+                    <th scope="col" class="d-none d-md-block">Number</th>
 
                     <th scope="col">ID</th>
 
@@ -41,7 +41,6 @@
                     <th class="pointer-event" scope="col">
                       <i class="pointer-event fas fa-sort-up"></i>Status
                     </th>
-                   
 
                     <th class="pointer-event d-none d-md-block" scope="col">
                       <i class="pointer-event fas fa-sort-up"></i>Show detail
@@ -53,16 +52,19 @@
                     v-for="(user, index) in filterBy(users, searchAdminUsers)"
                     :key="index"
                   >
-                    <td scope="row"  class="d-none d-md-block">{{ index + 1 }}</td>
+                    <td scope="row" class="d-none d-md-block">
+                      {{ index + 1 }}
+                    </td>
                     <td scope="row" v-if="user.user._id">
                       {{ user.user._id }}
                     </td>
                     <td>
                       <nuxt-link :to="`/users/${user.user._id}`">
                         <span>
-                        {{
-                          user.user.firstName + " " + user.user.lastName
-                        }}</span>
+                          {{
+                            user.user.firstName + " " + user.user.lastName
+                          }}</span
+                        >
                       </nuxt-link>
                     </td>
                     <td>
@@ -77,7 +79,6 @@
                         }}
                       </span>
                     </td>
-                    
 
                     <td>
                       <span
@@ -90,9 +91,6 @@
                       </span>
                     </td>
 
-
-
-                  
                     <td class="d-none d-md-block">
                       <nuxt-link :to="`/users/${user.user._id}`">
                         <button class="btn-state-admin btn-green">Info</button>
@@ -152,7 +150,10 @@ export default {
 
     this.$nextTick(() => {
       this.$nuxt.$loading.start();
-      setTimeout(() => this.$nuxt.$loading.finish(), 500);
+
+      if (this.users) {
+        this.$nuxt.$loading.finish();
+      }
     });
   },
 
@@ -161,7 +162,13 @@ export default {
       let self = this;
       self.loading = true;
       await this.$axios
-        .$get(`${process.env.API_URL}/admin/users?filters={}`)
+        .$get(`${process.env.API_URL}/admin/users?filters={}`,{
+            headers: {
+              Accept: "application/json",
+              "x-auth-userid": self.$cookies.get("userId"),
+              "x-auth-logintoken": self.$cookies.get("loginToken"),
+            },
+          })
         .then((res) => {
           if (res.statusCode) {
             self.$bvToast.toast(res.code, {
@@ -183,8 +190,6 @@ export default {
         })
         .finally(() => (self.loading = false));
     },
-  
-    
   },
 };
 </script>

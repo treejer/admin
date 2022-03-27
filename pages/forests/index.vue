@@ -1,151 +1,313 @@
 <template>
-  <div class="container admin-trees">
-    <div class="row">
-      <div class="col-12 col-xl-8 col-md-6 offset-md-1 offset-xl-0  mb-5 pb-5  admin-left-side">
-        <div class="box">
-          <div class="header-box border-bottom">
-            <p class="param-18 font-weight-bolder tr-gray-two">Tree Settings</p>
-          </div>
-          <div class="body-box border-bottom">
-            <div class="title">
-              <p class="param tr-gray-three">TREE PRICE</p>
-            </div>
-            <div class="main w-100 d-flex">
-              <form class="form-group">
-                <label for="current_price" class="first-input param tr-gray-two"
-                  >Current price
-                  <input
-                    class="form-control param tr-gray-three"
-                    type="text"
-                    id="current_price"
-                    placeholder="$4"
-                  />
-                </label>
-                <label for="new_price" class="param tr-gray-two"
-                  >New price
-                  <input
-                    class="form-control param tr-gray-three"
-                    type="text"
-                    id="new_price"
-                    placeholder="New price"
-                  />
-                </label>
-                <button class="btn-green mt-5 d-block">Update</button>
-              </form>
+  <div class="container trees-admin">
+    <div class="row pl-3 pr-3">
+      <div class="users col-12 col-xl-12 col-md-11 offset-md-1 offset-xl-0">
+        <div class="row">
+          <div class="col-12 py-3 pl-3">
+            <h4 class="title-sm tr-gray-one text-left">Trees</h4>
+            <div class="position-relative w-50 search-admin-user-box">
+              <input
+                class="search-admin-user"
+                v-model="searchAdminUsers"
+                placeholder="Search by Id or planter address"
+              />
+              <img
+                src="~/assets/images/tree-profile/search.svg"
+                alt="search"
+                class="search-icon"
+              />
             </div>
           </div>
-          <div class="body-box border-bottom">
-            <div class="title">
-              <p class="param tr-gray-three">
-                O1 MINTING RATE (Per second per tree)
-              </p>
-            </div>
-            <div class="main w-100 d-flex">
-              <form class="form-group">
-                <label for="current_price" class="first-input param tr-gray-two"
-                  >Current rate
-                  <input
-                    class="form-control param tr-gray-three"
-                    type="text"
-                    id="current_price"
-                    placeholder="0.000001"
-                  />
-                </label>
-                <label for="new_price" class="param tr-gray-two"
-                  >New rate
-                  <input
-                    class="form-control param tr-gray-three"
-                    type="text"
-                    id="new_price"
-                    placeholder="New rate"
-                  />
-                </label>
-                <button class="btn-green mt-5 d-block">Update</button>
-              </form>
+          <div class="col-12 col-md-12 p-0">
+            <div class="admin-user-table">
+              <table class="table border-0 dir-ltr">
+                <thead>
+                <tr>
+                  <th scope="col">Number</th>
+
+                  <th scope="col">ID</th>
+
+
+                  <th class="pointer-event" scope="col">
+                    <i class="pointer-event fas fa-sort-up"></i>Plant Date
+                  </th>
+                  <th class="pointer-event" scope="col">
+                    <i class="pointer-event fas fa-sort-up"></i>Planter
+                  </th>
+                  <th class="pointer-event" scope="col">
+                    <i class="pointer-event fas fa-sort-up"></i>TreeSpecsEntity
+                  </th>
+                  <th class="pointer-event" scope="col">
+                    <i class="pointer-event fas fa-sort-up"></i>UpdatedAt
+                  </th>
+
+                  <th class="pointer-event d-none d-md-block" scope="col">
+                    <i class="pointer-event fas fa-sort-up"></i>Show detail
+                  </th>
+                </tr>
+                </thead>
+                <tbody v-if="trees">
+                <tr
+                  v-for="(tree, index) in filterBy(trees, searchAdminUsers)"
+                  :key="index"
+                >
+                  <td scope="row">{{ index + 1 }}</td>
+                  <td scope="row" v-if="tree">
+                    {{ tree.id }}
+                  </td>
+                  <td>
+                      <span>{{
+                        tree.plantDate
+                      }}</span>
+                  </td>
+                  <td>
+                    <span v-coin>{{ tree.planter.id }}</span>
+                  </td>
+                  <td>
+                      <span>
+                        {{
+                          tree.treeSpecsEntity === null ? 'Empty' :tree.treeSpecsEntity
+                        }}
+                      </span>
+                  </td>
+                  <td>
+                      <span>{{
+                       tree.plantDate
+                      }}</span>
+                  </td>
+                  <!--<td>-->
+                  <!--<button-->
+                  <!--@click.prevent="sendVerifyAndReject(user)"-->
+                  <!--class="btn-state-admin"-->
+                  <!--:class="-->
+                  <!--user.user.isVerified ? 'btn-green' : 'btn-warning'-->
+                  <!--"-->
+                  <!--&gt;-->
+                  <!--{{ user.user.isVerified ? "Verified" : "Pending" }}-->
+                  <!--</button>-->
+                  <!--</td>-->
+                  <td class="d-none d-md-block">
+                  <nuxt-link :to="`/forests/${tree.id}`">
+                  <button class="btn-state-admin btn-green">Info</button>
+                  </nuxt-link>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+              <div
+                class="
+                  tr-pagination
+                  d-flex
+                  justify-content-center
+                  w-100
+                  position-relative
+                "
+              >
+
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-      <div class="col-12 col-md-5 col-xl-3 admin-right-side">
-        <div class="box">
-          <p class="param-18 font-weight-bolder tr-gray-two">Getting Started</p>
-          <p class="param tr-gray-three">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            venenatis, sem sit amet pretium facilisis, felis ligula sollicitudin
-            neque, a vestibulum metus leo sit amet orci. Vivamus iaculis nibh ac
-            est viverra euismod. Ut ac varius justo, eget mattis urna. Donec non
-            lacus sit amet nisl egestas suscipit. Vivamus bibendum elementum
-            lacus ac varius.
-          </p>
         </div>
       </div>
     </div>
   </div>
 </template>
-
 <script>
-export default {
-  components: {},
-  layout: "dashboard",
-  name: "forests",
-  loading: false,
+  import Fab from "@/components/font-awsome/Fab";
+  import Vue2Filters from "vue2-filters";
 
-  mounted() {
-    this.$nextTick(() => {
-      this.$nuxt.$loading.start();
-      setTimeout(() => this.$nuxt.$loading.finish(), 500);
-    });
-  },
+  export default {
+    mixins: [Vue2Filters.mixin],
 
-  data() {
-    return {};
-  },
-};
+    name: "trees",
+    layout: "dashboard",
+    loading: false,
+    data() {
+      return {
+        trees: null,
+        searchAdminUsers: "",
+        loadMore: 0
+      };
+    },
+    middleware: "auth",
+
+    components: {
+      Fab,
+    },
+
+    async mounted() {
+      await this.getTress();
+
+      this.$nextTick(() => {
+        this.$nuxt.$loading.start();
+        setTimeout(() => this.$nuxt.$loading.finish(), 500);
+      });
+    },
+
+    methods: {
+      async getTress() {
+        let self = this;
+        self.loading = true;
+        await self.$axios
+          .$post(`${process.env.GRAPHQL_URL}`, {
+            query: `{
+             tempTrees(first: 50, skip: ${self.loadMore}, orderBy: createdAt, orderDirection: desc)   {
+                  id
+	              	planter {id}
+	              	status
+	              	plantDate
+	              	treeSpecsEntity{
+                    latitude
+                    longitude
+                    nursery
+                    locations
+                  }
+	              	createdAt
+	              	updatedAt
+             }
+          }
+          `
+          })
+          .then((res) => {
+            if (res.statusCode) {
+              self.$bvToast.toast(res.code, {
+                variant: "danger",
+                title: "Forbidden",
+                toaster: "b-toaster-bottom-left",
+              });
+            } else {
+              self.trees = res.data.tempTrees;
+              console.log(self.trees, "self.users is here");
+            }
+          })
+          .catch((err) => {
+            self.$bvToast.toast(err.message, {
+              variant: "danger",
+              title: "Forbidden",
+              toaster: "b-toaster-bottom-left",
+            });
+          })
+          .finally(() => (self.loading = false));
+      },
+      // async sendVerifyAndReject(user) {
+      //   if (!confirm("Do you really want to change status?")) {
+      //     return;
+      //   }
+      //
+      //   let self = this;
+      //
+      //   const path = user.user.isVerified ? "reject" : "verify";
+      //
+      //   await self.$axios
+      //     .$patch(
+      //       `${process.env.API_URL}/admin/${path}?userid=${user.user._id}`,
+      //       {},
+      //       {
+      //         headers: {
+      //           Accept: "application/json",
+      //           "x-auth-userid": this.$cookies.get("userId"),
+      //           "x-auth-logintoken": this.$cookies.get("loginToken"),
+      //         },
+      //       }
+      //     )
+      //     .then((res) => {
+      //       console.log(res, "res is here");
+      //
+      //       if (res.statusCode) {
+      //         self.$bvToast.toast(res.code, {
+      //           variant: "danger",
+      //           title: "Forbidden",
+      //           toaster: "b-toaster-bottom-left",
+      //         });
+      //       } else {
+      //         this.$bvToast.toast(
+      //           `User status successfully changed to ${
+      //             user.user.isVerified ? "Rejected" : "Verified"
+      //             }`,
+      //           {
+      //             variant: "success",
+      //             title: "Update status successful",
+      //             toaster: "b-toaster-bottom-left",
+      //           }
+      //         );
+      //
+      //         this.getUsers();
+      //       }
+      //     })
+      //     .catch((err) => {
+      //       console.log(err, "err is here");
+      //
+      //       self.$bvToast.toast(err.message, {
+      //         variant: "danger",
+      //         title: "Forbidden",
+      //         toaster: "b-toaster-bottom-left",
+      //       });
+      //     });
+      // },
+
+    },
+  };
 </script>
-
 <style lang="scss" scoped>
-.admin-trees {
-  @media (max-width: 768px) {
-    margin-bottom: 100px;
-  }
-  .admin-left-side {
-    .box {
-      min-height: 591px;
-      width: 100%;
-      background: #ffffff;
-      box-shadow: 4px 4px 44px rgba(0, 0, 0, 0.1);
+  .trees-admin {
+    .search-admin-user {
+      min-width: 100%;
+      background: #e5e7db;
+      border: 2px solid #fff;
+      box-sizing: border-box;
+      border-radius: 18px;
+      padding: 5px 15px;
+      font-size: 14px;
+    }
+    .search-icon {
+      position: absolute;
+      right: 50px;
+      top: 12px;
+    }
+    @media (max-width: 767px) {
+      .search-admin-user-box {
+        width: 100% !important;
+      }
+      .search-admin-user {
+        font-size: 12px;
+      }
+      .search-icon {
+        right: 5px;
+        top: 8px;
+      }
+    }
+    .admin-user-table {
+      position: relative;
+      border: 1px solid #bdbdbd;
+      box-sizing: border-box;
       border-radius: 12px;
-      input {
-        background: #ffffff;
-        border: 1px solid #bdbdbd;
-        box-sizing: border-box;
+      margin-bottom: 150px;
+      overflow-x: scroll;
+
+      tr,
+      td,
+      th {
+        border: none;
+        font-size: 14px;
+        line-height: 17px;
+
+        color: #424242;
+      }
+      .table thead {
+        background: #e5e7db;
+      }
+
+      tr th {
+        font-size: 14px;
+        line-height: 17px;
+        color: #757575;
+      }
+      .btn-state-admin {
+        padding: 5px 15px;
+
+        border: none;
         border-radius: 6px;
-        margin-top: 10px;
-      }
-      button {
-        padding: 10px 16px;
-      }
-      label.first-input {
-        margin-right: 32px;
-      }
-      .header-box {
-        padding: 32px;
-      }
-      .body-box {
-        background: #f5f5f5;
-        padding: 32px;
-        height: 100%;
-        border-radius: 0px 0px 12px 12px;
       }
     }
   }
-  .admin-right-side {
-    .box {
-      padding: 32px;
-      min-height: 230px;
-      background: #efe4c6;
-      border-radius: 12px;
-    }
-  }
-}
 </style>
