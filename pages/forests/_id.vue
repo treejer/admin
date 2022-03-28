@@ -15,9 +15,88 @@
                 :src="`${icon}${tree.planter.id}`"
                 alt="user-banner"
               />
+               <h1 class="title-md tr-gray-nine mt-2 font-weight-bolder">
+                Tree {{
+                  tree.id
+                }}
+              </h1>
             </div>
           </div>
         </div>
+      </div>
+      <div class="col-12 mb-5">
+        <div
+        class="
+          mt-5
+          font-weight-bolder
+          param-gray-two
+          user-detail-main
+          position-relative
+          over-flow-hidden
+          w-100
+        "
+      >
+        <div class="edit-button text-capitalize">
+          <img
+            class="pointer-event"
+            src="~/assets/images/users/edit-button.svg"
+            alt=""
+            @click.prevent="changeProfile()"
+          />
+
+          <b-button class="btn-green" v-b-modal.modal-1 v-if="txData"
+            >Show Verify Box</b-button
+          >
+
+        
+        </div>
+
+        <h2 class="title tr-gray-two mb-md-4 font-weight-bolder">Tree Info</h2>
+
+        <p>
+         ID: <span>{{ tree.id }}</span>
+        </p>
+        <p>
+         Birth date: <span>{{ tree.birthDate }}</span>
+        </p>
+       <p>
+          Country Code: <span>{{ tree.countryCode }}</span>
+        </p>
+        <p>
+         CreatedAt: <span>{{ tree.createdAt }}</span>
+        </p>
+
+       <p>
+          Createdat:
+          <span>{{
+            $moment(tree.createdAt).utc()
+          }}</span>
+        </p>
+      <p>
+          Plant date: <span>{{ tree.plantDate }}</span>
+        </p>
+      <p>
+         Planter: <span>{{ tree.planter.id }}</span>
+        </p>
+         <p>
+          Status:
+          <span>{{
+          tree.status
+          
+          }}</span>
+        </p>
+         <p>
+          TreeSpecs: <span>{{tree.treeSpecs}}</span>
+        </p>
+       <p>
+          Tree Specs Entity: <span>{{ tree.treeSpecsEntity }}</span>
+        </p>
+         <p>
+          UpdatedAt: <span>{{ tree.updatedAt }}</span>
+        </p>
+  
+        </div>
+      </div>
       </div>
     </div>
   </div>

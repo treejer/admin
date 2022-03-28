@@ -41,29 +41,21 @@ export default {
       checkSidbar: true,
     };
   },
-  async created() {
-    await this.checkRouteSidbar();
+  created() {
+    if (!this.$cookies.get("setSidebarIndex")) {
+      return null;
+    } else {
+      this.$store.commit(
+        "SET_SIDEBAR_INDEX",
+        this.$cookies.get("setSidebarIndex")
+      );
+    }
   },
- 
+
   methods: {
-    async changeIndex(id) {
-
-      await this.$store.commit("SET_SIDEBAR_INDEX", id);
-    },
-    async checkRouteSidbar() {
-      let hist = this.$route.path;
-      switch (hist) {
-        case "/users" || "/users/*" || "/users/":
-          this.$store.commit("SET_SIDEBAR_INDEX", 1);
-          break;
-        case "/forests":
-          this.$store.commit("SET_SIDEBAR_INDEX", 2);
-          break;
-        case "/sheild":
-          this.$store.commit("SET_SIDEBAR_INDEX", 3);
-
-          break;
-      }
+    changeIndex(id) {
+      this.$store.commit("SET_SIDEBAR_INDEX", id);
+      this.$cookies.set("setSidebarIndex", id);
     },
   },
 };
@@ -78,7 +70,6 @@ export default {
   top: 0;
 
   ul {
-    
     li {
       margin-bottom: 35px;
       position: relative;
@@ -95,9 +86,7 @@ export default {
   }
 }
 @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
-  
   /* CSS */
-  
 }
 @media (max-width: 768px) {
   .sidebar {
@@ -105,7 +94,7 @@ export default {
     text-align: center;
     position: relative;
     margin-top: 40px;
-    margin-bottom:40px;
+    margin-bottom: 40px;
     ul {
       display: flex;
       flex-direction: row !important;
