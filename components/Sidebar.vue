@@ -14,7 +14,7 @@
         </nuxt-link>
       </li>
       <li class="nav-item pointer-event forests" @click="changeIndex(2)">
-        <nuxt-link to="/forests">
+        <nuxt-link to="/trees">
           <forestsIcon :activeLogo="$store.state.index === 2 ? true : false" />
         </nuxt-link>
       </li>
@@ -41,11 +41,11 @@ export default {
       checkSidbar: true,
     };
   },
-  created() {
-    if (!this.$cookies.get("setSidebarIndex")) {
-      return null;
+ async created() {
+    if (await !this.$cookies.get("setSidebarIndex")) {
+      this.$store.commit("SET_SIDEBAR_INDEX", 0);
     } else {
-      this.$store.commit(
+      await this.$store.commit(
         "SET_SIDEBAR_INDEX",
         this.$cookies.get("setSidebarIndex")
       );
