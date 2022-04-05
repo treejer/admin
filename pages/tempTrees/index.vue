@@ -87,7 +87,7 @@
                   <!--</button>-->
                   <!--</td>-->
                   <td class="d-none d-md-block">
-                  <nuxt-link :to="`/forests/${tree.id}`">
+                  <nuxt-link :to="`/tempTrees/${tree.id}`">
                   <button class="btn-state-admin btn-green">Info</button>
                   </nuxt-link>
                   </td>

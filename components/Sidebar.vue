@@ -13,9 +13,9 @@
           <usersIcon :activeLogo="$store.state.index === 1 ? true : false" />
         </nuxt-link>
       </li>
-      <li class="nav-item pointer-event forests" @click="changeIndex(2)">
-        <nuxt-link to="/trees">
-          <forestsIcon :activeLogo="$store.state.index === 2 ? true : false" />
+      <li class="nav-item pointer-event temptrees" @click="changeIndex(2)">
+        <nuxt-link to="/tempTrees">
+          <TemptreesIcon :activeLogo="$store.state.index === 2 ? true : false" />
         </nuxt-link>
       </li>
       <li class="nav-item pointer-event sheild" @click="changeIndex(3)">
@@ -30,12 +30,12 @@
 <script>
 import usersIcon from "@/components/admin/usersIcon.vue";
 import DashboardIcon from "./admin/dashboardIcon.vue";
-import ForestsIcon from "./admin/forestsIcon.vue";
+import TemptreesIcon from "./admin/temptreesIcon.vue";
 import sheildIcon from "./admin/sheildIcon.vue";
 
 export default {
   name: "Sidebar",
-  components: { usersIcon, DashboardIcon, ForestsIcon, sheildIcon },
+  components: { usersIcon, DashboardIcon, TemptreesIcon, sheildIcon },
   data() {
     return {
       checkSidbar: true,
