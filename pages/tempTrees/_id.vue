@@ -16,7 +16,7 @@
                 alt="user-banner"
               />
                <h1 class="title-md tr-gray-nine mt-2 font-weight-bolder">
-                Tree {{
+                Temp Tree {{
                   tree.id
                 }}
               </h1>
@@ -54,26 +54,33 @@
         <h2 class="title tr-gray-two mb-md-4 font-weight-bolder">Tree Info</h2>
 
         <p>
-         ID: <span>{{ tree.id }}</span>
+         ID: <span>{{ `${$hex2Dec(tree.id)} - hex: ${tree.id}` }}</span>
         </p>
         <p>
-         Birth date: <span>{{ tree.birthDate }}</span>
+         Birth date: <span>{{
+                          $moment(tree.birthDate * 1000).strftime(
+                            "%Y-%m-%d %I:%M:%S"
+                          )
+                        }}</span>
         </p>
        <p>
           Country Code: <span>{{ tree.countryCode }}</span>
         </p>
         <p>
-         CreatedAt: <span>{{ tree.createdAt }}</span>
+         CreatedAt: <span>{{
+                          $moment(tree.createdAt * 1000).strftime(
+                            "%Y-%m-%d %I:%M:%S"
+                          )
+                        }}</span>
         </p>
 
-       <p>
-          Createdat:
-          <span>{{
-            $moment(tree.createdAt).utc()
-          }}</span>
-        </p>
+       
       <p>
-          Plant date: <span>{{ tree.plantDate }}</span>
+          Plant date: <span>{{
+                          $moment(tree.plantDate * 1000).strftime(
+                            "%Y-%m-%d %I:%M:%S"
+                          )
+                        }}</span>
         </p>
       <p>
          Planter: <span>{{ tree.planter.id }}</span>
@@ -86,15 +93,12 @@
           }}</span>
         </p>
          <p>
-          TreeSpecs: <span>{{tree.treeSpecs}}</span>
+          TreeSpecs: <span><a :href="`https://ipfs.treejer.com/ipfs/${tree.treeSpecs}`" target="_blank">{{tree.treeSpecs}}</a> </span>
         </p>
        <p>
           Tree Specs Entity: <span>{{ tree.treeSpecsEntity }}</span>
         </p>
-         <p>
-          UpdatedAt: <span>{{ tree.updatedAt }}</span>
-        </p>
-  
+         
         </div>
       </div>
       </div>
@@ -103,6 +107,7 @@
 </template>
 <script>
 export default {
+  name: "tempTree",
   layout: "dashboard",
   data() {
     return {
@@ -121,7 +126,7 @@ export default {
       await self.$axios
         .$post(`${process.env.GRAPHQL_URL}`, {
           query: `{
-             tempTree(id: "${self.$route.params.id}"){
+             tempTree(id: "${this.$dec2hex(self.$route.params.id)}"){
             id
             planter {
             id

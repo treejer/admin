@@ -1,14 +1,13 @@
 <template>
-  <div class="container trees-admin">
+  <div class="container tempTrees-admin">
     <div class="row pl-3 pr-3">
       <div class="users col-12 col-xl-12 col-md-11 offset-md-1 offset-xl-0">
         <div class="row">
           <div class="col-12 py-3 pl-3">
-            <h4 class="title-sm tr-gray-one text-left">Trees</h4>
+            <h4 class="title-sm tr-gray-one text-left">Temp Trees</h4>
             <div class="position-relative w-50 search-admin-user-box">
               <input
                 class="search-admin-user"
-                v-model="searchAdminUsers"
                 placeholder="Search by Id or planter address"
               />
               <img
@@ -23,13 +22,12 @@
               <table class="table border-0 dir-ltr">
                 <thead>
                 <tr>
-                  <th scope="col">Number</th>
 
                   <th scope="col">ID</th>
 
 
                   <th class="pointer-event" scope="col">
-                    <i class="pointer-event fas fa-sort-up"></i>Plant Date
+                    <i class="pointer-event fas fa-sort-up"></i>Submit Date
                   </th>
                   <th class="pointer-event" scope="col">
                     <i class="pointer-event fas fa-sort-up"></i>Planter
@@ -37,28 +35,26 @@
                   <th class="pointer-event" scope="col">
                     <i class="pointer-event fas fa-sort-up"></i>TreeSpecsEntity
                   </th>
-                  <th class="pointer-event" scope="col">
-                    <i class="pointer-event fas fa-sort-up"></i>UpdatedAt
-                  </th>
 
                   <th class="pointer-event d-none d-md-block" scope="col">
                     <i class="pointer-event fas fa-sort-up"></i>Show detail
                   </th>
                 </tr>
                 </thead>
-                <tbody v-if="trees">
+                <tbody v-if="tempTrees">
                 <tr
-                  v-for="(tree, index) in filterBy(trees, searchAdminUsers)"
+                  v-for="(tree, index) in tempTrees"
                   :key="index"
                 >
-                  <td scope="row">{{ index + 1 }}</td>
                   <td scope="row" v-if="tree">
-                    {{ tree.id }}
+                    {{ $hex2Dec(tree.id) }}
                   </td>
                   <td>
                       <span>{{
-                        tree.plantDate
-                      }}</span>
+                          $moment(tree.createdAt * 1000).strftime(
+                            "%Y-%m-%d %I:%M:%S"
+                          )
+                        }}</span>
                   </td>
                   <td>
                     <span v-coin>{{ tree.planter.id }}</span>
@@ -70,11 +66,7 @@
                         }}
                       </span>
                   </td>
-                  <td>
-                      <span>{{
-                       tree.plantDate
-                      }}</span>
-                  </td>
+
                   <!--<td>-->
                   <!--<button-->
                   <!--@click.prevent="sendVerifyAndReject(user)"-->
@@ -87,7 +79,7 @@
                   <!--</button>-->
                   <!--</td>-->
                   <td class="d-none d-md-block">
-                  <nuxt-link :to="`/tempTrees/${tree.id}`">
+                  <nuxt-link :to="`/tempTrees/${$hex2Dec(tree.id)}`">
                   <button class="btn-state-admin btn-green">Info</button>
                   </nuxt-link>
                   </td>
@@ -119,24 +111,22 @@
   export default {
     mixins: [Vue2Filters.mixin],
 
-    name: "trees",
+    name: "tempTrees",
     layout: "dashboard",
     loading: false,
     data() {
       return {
-        trees: null,
-        searchAdminUsers: "",
+        tempTrees: null,
+        searchTempTrees: "",
         loadMore: 0
       };
     },
-    middleware: "auth",
-
     components: {
       Fab,
     },
 
     async mounted() {
-      await this.getTress();
+      await this.getTempTress();
 
       this.$nextTick(() => {
         this.$nuxt.$loading.start();
@@ -145,7 +135,7 @@
     },
 
     methods: {
-      async getTress() {
+      async getTempTress() {
         let self = this;
         self.loading = true;
         await self.$axios
@@ -176,8 +166,8 @@
                 toaster: "b-toaster-bottom-left",
               });
             } else {
-              self.trees = res.data.tempTrees;
-              console.log(self.trees, "self.users is here");
+              self.tempTrees = res.data.tempTrees;
+              console.log(self.tempTrees, "self.tempTrees is here");
             }
           })
           .catch((err) => {
@@ -249,7 +239,7 @@
   };
 </script>
 <style lang="scss" scoped>
-  .trees-admin {
+  .tempTrees-admin {
     .search-admin-user {
       min-width: 100%;
       background: #e5e7db;
