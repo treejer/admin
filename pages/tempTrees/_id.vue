@@ -72,6 +72,16 @@
       <p>
          Planter: <span>{{ tree.planter.id }}</span>
         </p>
+
+        <div v-if="planterData">
+          
+          <p>
+            Planter Name: <a :href="`/users/${planterData.user._id}`" target="_blank">{{ planterData.user.firstName + " " + planterData.user.lastName }}</a>
+          </p>
+
+        </div>
+
+
          <p>
           Status:
           <span>{{
@@ -124,7 +134,6 @@
 <script>
 import TreeFactoryABI from "~/static/abis/TreeFactory.json";
 
-
 export default {
   name: "tempTree",
   layout: "dashboard",
@@ -134,15 +143,50 @@ export default {
       icon: process.env.GRAVATAR,
       loading: {
         verify: false,
-        reject: false
-      }
+        reject: false,
+      },
+      planterData: null,
     };
   },
   async created() {
     console.log(this, "this is here");
     await this.getTree();
+
+    await this.getPlanterData();
   },
   methods: {
+    async getPlanterData() {
+      let self = this;
+
+      if (
+        !this.tree ||
+        !this.tree.planter ||
+        !this.$cookies.get("loginToken") ||
+        !this.$cookies.get("userId")
+      ) {
+        return;
+      }
+
+      await this.$axios
+        .$get(
+          `${process.env.API_URL}/admin/users-by-wallet/${this.tree.planter.id}`,
+          {
+            headers: {
+              Accept: "application/json",
+              "x-auth-userid": this.$cookies.get("userId"),
+              "x-auth-logintoken": this.$cookies.get("loginToken"),
+            },
+          }
+        )
+        .then((result) => {
+          console.log(result, "result is here");
+
+          self.planterData = result;
+        })
+        .catch((err) => {
+          console.log(err, "err is here");
+        });
+    },
 
     async verifyTree(status) {
       let self = this;
@@ -156,79 +200,90 @@ export default {
         return;
       }
 
-      let account = this.$cookies.get('account');
+      let account = this.$cookies.get("account");
 
       this.$web3.currentProvider.enable();
 
       try {
-
-        const TreeFactory = new this.$web3.eth.Contract(TreeFactoryABI, process.env.CONTRACT_TREE_FACTORY_ADDRESS)
+        const TreeFactory = new this.$web3.eth.Contract(
+          TreeFactoryABI,
+          process.env.CONTRACT_TREE_FACTORY_ADDRESS
+        );
 
         const tx = TreeFactory.methods.verifyTree(this.tree.id, status);
-        let gas = await tx.estimateGas({from: account});
+        let gas = await tx.estimateGas({ from: account });
 
-        const receipt = await this.$web3.eth.sendTransaction({
+        const receipt = await this.$web3.eth
+          .sendTransaction({
             from: account,
             to: TreeFactory._address,
             value: 0,
             data: tx.encodeABI(),
             gas: gas,
-            type: "0x2", 
+            type: "0x2",
             maxPriorityFeePerGas: null,
             maxFeePerGas: null,
-          }).on('transactionHash', (transactionHash) => {
-            self.$bvToast.toast(['Check progress on Etherscan'], {
-              toaster: 'b-toaster-bottom-left',
-              title: 'Processing transaction...',
-              variant: 'warning',
-              href: `${process.env.etherScanUrl}/tx/${transactionHash}`,
-              bodyClass: 'fund-error',
-              noAutoHide: true
-
-            })
           })
-          .on('error', (error) => {
+          .on("transactionHash", (transactionHash) => {
+            self.$bvToast.toast(["Check progress on Etherscan"], {
+              toaster: "b-toaster-bottom-left",
+              title: "Processing transaction...",
+              variant: "warning",
+              href: `${process.env.etherScanUrl}/tx/${transactionHash}`,
+              bodyClass: "fund-error",
+              noAutoHide: true,
+            });
+          })
+          .on("error", (error) => {
             console.log(error, "errorr");
             if (error.code === 32602) {
-              self.$bvToast.toast(['You don\'t have enough Ether (ETH)'], {
-                toaster: 'b-toaster-bottom-left',
-                title: 'Transaction failed',
-                variant: 'danger',
-                href: `${process.env.etherScanUrl}/tx/${transactionHash}`,
+              self.$bvToast.toast(["You don't have enough Ether (ETH)"], {
+                toaster: "b-toaster-bottom-left",
+                title: "Transaction failed",
+                variant: "danger",
                 noAutoHide: true,
-                bodyClass: 'fund-error'
-              })
-            }
-            else if(error.code === -32602) {
+                bodyClass: "fund-error",
+              });
+            } else if (error.code === -32602) {
               //do nothing
-            }
-            else {
-              self.$bvToast.toast([error.message.substring(0,100)], {
-                toaster: 'b-toaster-bottom-left',
-                title: 'Transaction failed',
-                variant: 'danger',
+            } else {
+              self.$bvToast.toast([error.message.substring(0, 100)], {
+                toaster: "b-toaster-bottom-left",
+                title: "Transaction failed",
+                variant: "danger",
                 href: `${process.env.etherScanUrl}/tx/${transactionHash}`,
                 noAutoHide: true,
-                bodyClass: 'fund-error'
-              })
+                bodyClass: "fund-error",
+              });
             }
+          });
 
-          })
+        if (receipt && receipt.transactionHash) {
+          this.$bvToast.toast(
+            ["Tree " + (status ? "Verified" : "Rejected") + " successfuly"],
+            {
+              toaster: "b-toaster-bottom-left",
+              title: "Transaction is successful",
+              variant: "success",
+              href: `${process.env.explorerUrl}/tx/${receipt.transactionHash}`,
+            }
+          );
 
+          this.planterStatus = 1;
+        }
       } catch (error) {
         console.log(error, "errorr");
 
-        self.$bvToast.toast([error.message.substring(0,100)], {
-          toaster: 'b-toaster-bottom-left',
-          title: 'Error occured!',
-          variant: 'danger',
+        self.$bvToast.toast([error.message.substring(0, 100)], {
+          toaster: "b-toaster-bottom-left",
+          title: "Error occured!",
+          variant: "danger",
           noAutoHide: true,
-          bodyClass: 'fund-error'
-        })  
+          bodyClass: "fund-error",
+        });
       }
 
       this.loading[type] = false;
-
     },
     async getTree() {
       let self = this;

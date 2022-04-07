@@ -50,7 +50,7 @@
                 <tbody v-if="users">
                   <tr
                     v-for="(user, index) in filterBy(users, searchAdminUsers)"
-                    :key="index"
+                    :key="`user-${index}`"
                   >
                     <td scope="row" class="d-none d-md-block">
                       {{ index + 1 }}

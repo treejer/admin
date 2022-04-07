@@ -157,7 +157,7 @@ export default {
       await self.$axios
         .$post(`${process.env.GRAPHQL_URL}`, {
           query: `{
-             tempTrees(first: 50, skip: ${self.loadMore}, orderBy: createdAt, orderDirection: desc)   {
+             tempTrees(first: 100, skip: ${self.loadMore}, orderBy: createdAt, orderDirection: asc)   {
                   id
 	              	planter {id}
 	              	status
@@ -195,61 +195,7 @@ export default {
         })
         .finally(() => (self.loading = false));
     },
-    // async sendVerifyAndReject(user) {
-    //   if (!confirm("Do you really want to change status?")) {
-    //     return;
-    //   }
-    //
-    //   let self = this;
-    //
-    //   const path = user.user.isVerified ? "reject" : "verify";
-    //
-    //   await self.$axios
-    //     .$patch(
-    //       `${process.env.API_URL}/admin/${path}?userid=${user.user._id}`,
-    //       {},
-    //       {
-    //         headers: {
-    //           Accept: "application/json",
-    //           "x-auth-userid": this.$cookies.get("userId"),
-    //           "x-auth-logintoken": this.$cookies.get("loginToken"),
-    //         },
-    //       }
-    //     )
-    //     .then((res) => {
-    //       console.log(res, "res is here");
-    //
-    //       if (res.statusCode) {
-    //         self.$bvToast.toast(res.code, {
-    //           variant: "danger",
-    //           title: "Forbidden",
-    //           toaster: "b-toaster-bottom-left",
-    //         });
-    //       } else {
-    //         this.$bvToast.toast(
-    //           `User status successfully changed to ${
-    //             user.user.isVerified ? "Rejected" : "Verified"
-    //             }`,
-    //           {
-    //             variant: "success",
-    //             title: "Update status successful",
-    //             toaster: "b-toaster-bottom-left",
-    //           }
-    //         );
-    //
-    //         this.getUsers();
-    //       }
-    //     })
-    //     .catch((err) => {
-    //       console.log(err, "err is here");
-    //
-    //       self.$bvToast.toast(err.message, {
-    //         variant: "danger",
-    //         title: "Forbidden",
-    //         toaster: "b-toaster-bottom-left",
-    //       });
-    //     });
-    // },
+    
   },
 };
 </script>
