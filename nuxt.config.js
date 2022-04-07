@@ -46,7 +46,7 @@ export default {
     apiUrl: process.env.API_URL || 'https://api.treejer.com',
     tokenUrl: process.env.TOKEN_URL || 'https://api.treejer.com',
     avatarURL: process.env.AVATAR_URL || 'https://avatars.treejer.com/',
-    etherScanUrl: process.env.ETHERSCAN_URL,
+    explorerUrl: process.env.EXPLORER_URL || 'https://etherscan.io',
     graphqlUrl: process.env.GRAPHQL_URL,
     zeroAddress: "0x0000000000000000000000000000000000000000",
     networkName: process.env.NETWORK_NAME,

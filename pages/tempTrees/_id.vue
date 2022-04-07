@@ -1,29 +1,7 @@
 <template>
   <div class="container user-page-details" v-if="tree">
     <div class="row">
-      <div class="col-12 position-relative">
-        <div
-          class="banner"
-          :style="`background-image:url(${icon}${tree.planter.id})`"
-        ></div>
 
-        <div class="box-banner-details">
-          <div class="row">
-            <div class="col-md-3 user-img">
-              <img
-                class="img-rounded"
-                :src="`${icon}${tree.planter.id}`"
-                alt="user-banner"
-              />
-               <h1 class="title-md tr-gray-nine mt-2 font-weight-bolder">
-                Temp Tree {{
-                  tree.id
-                }}
-              </h1>
-            </div>
-          </div>
-        </div>
-      </div>
       <div class="col-12 mb-5">
         <div
         class="
@@ -37,18 +15,27 @@
         "
       >
         <div class="edit-button text-capitalize">
-          <img
-            class="pointer-event"
-            src="~/assets/images/users/edit-button.svg"
-            alt=""
-            @click.prevent="changeProfile()"
-          />
 
-          <b-button class="btn-green" v-b-modal.modal-1 v-if="txData"
-            >Show Verify Box</b-button
+          <button
+            :class="{ disable: loading.verify }"
+            class="btn-green-md mt-1 mb-1"
+            @click="verifyTree(true)"
           >
+            <BSpinner v-if="loading.verify" class="mr-2" small type="grow">loading.verify</BSpinner>
+              Verify
+          </button>
 
-        
+
+          <button
+            :class="{ disable: loading.reject }"
+            class="btn-gray mt-1 mb-1"
+            @click="verifyTree(false)"
+          >
+            <BSpinner v-if="loading.reject" class="mr-2" small type="grow">loading.reject</BSpinner>
+              Reject
+          </button>
+
+          
         </div>
 
         <h2 class="title tr-gray-two mb-md-4 font-weight-bolder">Tree Info</h2>
@@ -92,12 +79,41 @@
           
           }}</span>
         </p>
-         <p>
+        <p>
           TreeSpecs: <span><a :href="`https://ipfs.treejer.com/ipfs/${tree.treeSpecs}`" target="_blank">{{tree.treeSpecs}}</a> </span>
         </p>
-       <p>
-          Tree Specs Entity: <span>{{ tree.treeSpecsEntity }}</span>
-        </p>
+
+
+
+       <h4>
+          Tree Specs Entity:
+        </h4>
+        <div v-if="tree.treeSpecsEntity">
+
+
+          <p>
+            <a
+              :href="`https://google.com/maps?q=loc:${tree.treeSpecsEntity.latitude / Math.pow(10, 6)},${tree.treeSpecsEntity.longitude / Math.pow(10, 6)}`"
+              target="_blank"
+            >
+              {{
+                `${tree.treeSpecsEntity.latitude / Math.pow(10, 6)},${tree.treeSpecsEntity.longitude / Math.pow(10, 6)}`
+              }}
+            </a>
+          </p>
+
+
+            <p>
+              Nursery: {{ tree.treeSpecsEntity.nursery ? 'Yes' : 'No' }}
+            </p>
+
+            
+            <img v-for="(update, index) in tree.treeSpecsEntity.updates" :key="`update-${index}`" width="400px"  :src="update.image" :alt="`update-${index}`">
+            
+
+        </div>
+
+
          
         </div>
       </div>
@@ -106,6 +122,9 @@
   </div>
 </template>
 <script>
+import TreeFactoryABI from "~/static/abis/TreeFactory.json";
+
+
 export default {
   name: "tempTree",
   layout: "dashboard",
@@ -113,6 +132,10 @@ export default {
     return {
       tree: null,
       icon: process.env.GRAVATAR,
+      loading: {
+        verify: false,
+        reject: false
+      }
     };
   },
   async created() {
@@ -120,9 +143,95 @@ export default {
     await this.getTree();
   },
   methods: {
+
+    async verifyTree(status) {
+      let self = this;
+
+      const type = status ? "verify" : "reject";
+
+      this.loading[type] = true;
+
+      if (!confirm("Are you sure? This transaction is irreversible!")) {
+        this.loading[type] = false;
+        return;
+      }
+
+      let account = this.$cookies.get('account');
+
+      this.$web3.currentProvider.enable();
+
+      try {
+
+        const TreeFactory = new this.$web3.eth.Contract(TreeFactoryABI, process.env.CONTRACT_TREE_FACTORY_ADDRESS)
+
+        const tx = TreeFactory.methods.verifyTree(this.tree.id, status);
+        let gas = await tx.estimateGas({from: account});
+
+        const receipt = await this.$web3.eth.sendTransaction({
+            from: account,
+            to: TreeFactory._address,
+            value: 0,
+            data: tx.encodeABI(),
+            gas: gas,
+            type: "0x2", 
+            maxPriorityFeePerGas: null,
+            maxFeePerGas: null,
+          }).on('transactionHash', (transactionHash) => {
+            self.$bvToast.toast(['Check progress on Etherscan'], {
+              toaster: 'b-toaster-bottom-left',
+              title: 'Processing transaction...',
+              variant: 'warning',
+              href: `${process.env.etherScanUrl}/tx/${transactionHash}`,
+              bodyClass: 'fund-error',
+              noAutoHide: true
+
+            })
+          })
+          .on('error', (error) => {
+            console.log(error, "errorr");
+            if (error.code === 32602) {
+              self.$bvToast.toast(['You don\'t have enough Ether (ETH)'], {
+                toaster: 'b-toaster-bottom-left',
+                title: 'Transaction failed',
+                variant: 'danger',
+                href: `${process.env.etherScanUrl}/tx/${transactionHash}`,
+                noAutoHide: true,
+                bodyClass: 'fund-error'
+              })
+            }
+            else if(error.code === -32602) {
+              //do nothing
+            }
+            else {
+              self.$bvToast.toast([error.message.substring(0,100)], {
+                toaster: 'b-toaster-bottom-left',
+                title: 'Transaction failed',
+                variant: 'danger',
+                href: `${process.env.etherScanUrl}/tx/${transactionHash}`,
+                noAutoHide: true,
+                bodyClass: 'fund-error'
+              })
+            }
+
+          })
+
+      } catch (error) {
+        console.log(error, "errorr");
+
+        self.$bvToast.toast([error.message.substring(0,100)], {
+          toaster: 'b-toaster-bottom-left',
+          title: 'Error occured!',
+          variant: 'danger',
+          noAutoHide: true,
+          bodyClass: 'fund-error'
+        })  
+      }
+
+      this.loading[type] = false;
+
+    },
     async getTree() {
       let self = this;
-      self.loading = true;
       await self.$axios
         .$post(`${process.env.GRAPHQL_URL}`, {
           query: `{
@@ -164,6 +273,15 @@ export default {
         .then((res) => {
           self.tree = res.data.tempTree;
           console.log(self.tree, "self.tree is here");
+
+          if (
+            res.data.tempTree.treeSpecsEntity &&
+            res.data.tempTree.treeSpecsEntity.updates
+          ) {
+            self.tree.treeSpecsEntity.updates = JSON.parse(
+              res.data.tempTree.treeSpecsEntity.updates
+            );
+          }
         })
         .catch((err) => {
           self.$bvToast.toast(err.message, {
@@ -172,7 +290,7 @@ export default {
             toaster: "b-toaster-bottom-left",
           });
         })
-        .finally(() => (self.loading = false));
+        .finally();
     },
   },
 };
