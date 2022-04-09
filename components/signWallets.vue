@@ -6,7 +6,7 @@
       class="connect-button sign-button"
       @click.prevent="getToken()"
     >
-      {{ !userAuthToken ? "Sign in to wallet" : "Loading..." }}
+      {{ !userAuthToken ? "Sign in by wallet" : "Loading..." }}
     </button>
   </div>
 </template>

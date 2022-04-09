@@ -1,5 +1,5 @@
 // export default async ({ app }) => {
-//   if (app.context.route.path === "/forests") {
+//   if (app.context.route.path === "/tempTrees") {
 //     return;
 //   } else {
 //     app.$axios.setHeader("Accept", "application/json, text/plain, */*");

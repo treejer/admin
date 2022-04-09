@@ -10,7 +10,7 @@ import Vue from 'vue';
       const secondRow = account.reverse().slice(0, 4).reverse()
       const sep = ['....']
       const accountArrayFinal = firstRow.concat(sep).concat(secondRow)
-      const stringAccount = accountArrayFinal.map(item => item !== null ? sliceAccount += item.toString() : null)
+      accountArrayFinal.map(item => item !== null ? sliceAccount += item.toString() : null)
       return  el.innerText = sliceAccount
 
     }
