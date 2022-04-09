@@ -137,7 +137,6 @@ export default {
               firstAccount = e[0];
             }) 
 
-            console.log(firstAccount, "account")
 
             this.$cookies.set("account", firstAccount);
 

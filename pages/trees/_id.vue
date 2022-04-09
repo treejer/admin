@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col-12 position-relative">
         <div
-          class="banner"
+          class="banner mr-2 ml-2"
           :style="`background-image:url(${icon}${tree.planter.id})`"
         ></div>
 
@@ -41,12 +41,15 @@
             class="pointer-event"
             src="~/assets/images/users/edit-button.svg"
             alt=""
-            @click.prevent="changeProfile()"
+            @click.prevent=""
           />
 
-          <b-button class="btn-green" v-b-modal.modal-1 v-if="txData"
-            >Show Verify Box</b-button
+          <button @click="$bvModal.show('eight')" class="btn-green mt-5"  
+            >Show Verify Box</button
           >
+           <b-modal  size="xl" hide-footer  id="eight">
+            <p>hiiiii</p>  
+          </b-modal>
 
         
         </div>
@@ -83,12 +86,23 @@
          <p>
           TreeSpecs: <span>{{tree.treeSpecs}}</span>
         </p>
-       <p>
-          Tree Specs Entity: <span>{{ tree.treeSpecsEntity }}</span>
-        </p>
-         <p>
+       <a
+              class="mb-3 font-weight-bolder tr-green"
+              :href="`https://www.google.com/maps/search/?api=1&query=${tree.treeSpecsEntity.latitude},${tree.treeSpecsEntity.longitude}`"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View on googlemap
+            </a>
+              <p class="mt-3">
           UpdatedAt: <span>{{ $moment(tree.updatedAt * 1000).strftime("%Y-%m-%d %I:%M:%S") }}</span>
         </p>
+        <div class="image-box" v-for="(item,index) in  treeSpecsEntity" :key="index" >
+          
+          <img  :src="item.image" :alt="item.image" class="border"    height="300">
+        </div>
+        
+       
   
         </div>
       </div>
@@ -103,10 +117,12 @@ export default {
     return {
       tree: null,
       icon: process.env.GRAVATAR,
+      treeSpecsEntity: null,
     };
   },
+    middleware: "auth",
+
   async created() {
-    console.log(this, "this is here");
     await this.getTree();
   },
   methods: {
@@ -153,7 +169,7 @@ export default {
         })
         .then((res) => {
           self.tree = res.data.tempTree;
-          console.log(self.tree, "self.tree is here");
+          self.treeSpecsEntity = JSON.parse(self.tree.treeSpecsEntity.updates);
         })
         .catch((err) => {
           self.$bvToast.toast(err.message, {
@@ -169,20 +185,19 @@ export default {
 </script>
 <style lang="scss" scoped>
 .user-page-details {
+  margin-bottom: 150px;
   .banner {
-    padding: 15px 25px;
     background-size: 100% 100%;
     background-repeat: no-repeat;
     min-height: 25vh;
-    box-shadow: 4px 4px 44px rgba(0, 0, 0, 0.1);
     border-radius: 7px;
     filter: blur(8px);
     -webkit-filter: blur(8px);
-    border: 2px solid rgb(255, 255, 255);
-    width: 100%;
+    border: 2px solid white;
+    width: 97.6%;
     position: absolute;
     top: 20px;
-    left: 0;
+    left: 7px;
   }
   .box-banner-details {
     margin-top: 50px;

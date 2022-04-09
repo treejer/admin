@@ -1,7 +1,7 @@
 <template>
-  <div :class="$route.name" style="min-height: 100vh">
+  <div :class="$route.name">
     <DashboardHeader/>
-    <div class="container-fluid p-md-0" :class="$route.name"  style="min-height: 85vh">
+    <div class="container-fluid p-md-0" :class="$route.path">
       <div class="row">
         <Sidebar />
         <nuxt />
@@ -12,7 +12,7 @@
 </template>
 
 <style lang="scss"></style>
-<script>
+<script>  
 import DashboardHeader from "../components/DashboardHeader";
 import Footer from "../components/Footer";
 import Sidebar from "../components/Sidebar";

@@ -293,7 +293,6 @@ export default {
             },
           })
         .then((result) => {
-          console.log(result, "result is here");
 
           self.userDetails = result;
 
@@ -341,7 +340,6 @@ export default {
         .catch((err) => {
           console.log(err, "err is here");
         });
-      console.log(self.userDetails, "self.user is here");
     },
     async downloadFile() {
       if (!this.userDetails.file && !this.userDetails.file.filename) {
@@ -464,7 +462,6 @@ export default {
         .hasRole(this.txData.roleValue, this.txData.publicAddress)
         .call()
         .then(function (result) {
-          console.log(result, "hasRole result is here");
           self.roleGranted = result;
         });
 
@@ -472,15 +469,12 @@ export default {
         .planters(this.txData.publicAddress)
         .call()
         .then(function (result) {
-          console.log(result, "getPlanter result is here");
           self.planterStatus = result.status;
         });
     },
 
     async joinByAdmin() {
-      console.log("joinByAdmin");
 
-      console.log(this.txData, "this.txData");
 
       if (this.roleGranted && this.planterStatus == 1) {
         this.$bvToast.toast("this planter already is planter", {
@@ -563,9 +557,6 @@ export default {
           this.txData.organizationAddress
         );
       }
-
-      console.log(txPlanter, "txPlanter");
-
       const dataPlanter = txPlanter.encodeABI();
 
       let transactions = [
@@ -586,8 +577,7 @@ export default {
         nonce: nextNonce,
       };
 
-      console.log(transactions, "transactions");
-      console.log(options, "options");
+    
 
       this.$web3.currentProvider.enable();
 
@@ -596,15 +586,12 @@ export default {
         options
       );
 
-      console.log("safeTransaction", safeTransaction);
 
       const txHash = await safeSdk.getTransactionHash(safeTransaction);
 
-      console.log(txHash, "txHash is here");
 
       const signature = await safeSdk.signTransactionHash(txHash);
 
-      console.log(signature, "signature is here");
 
       try {
         await safeService.proposeTransaction({
@@ -657,19 +644,17 @@ export default {
 .user-page-details {
 
   .banner {
-    padding: 15px 25px;
     background-size: 100% 100%;
     background-repeat: no-repeat;
     min-height: 25vh;
-    box-shadow: 4px 4px 44px rgba(0, 0, 0, 0.1);
     border-radius: 7px;
     filter: blur(8px);
     -webkit-filter: blur(8px);
-    border: 2px solid rgb(255, 255, 255);
-    width: 100%;
+    border: 2px solid white;
+    width: 97.6%;
     position: absolute;
     top: 20px;
-    left: 0;
+    left: 7px;
   }
   .box-banner-details {
     margin-top: 50px;

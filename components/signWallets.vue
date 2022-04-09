@@ -47,7 +47,6 @@ export default {
             res.message,
             from
           ).then((signature) => {
-            console.log(signature, "signature");
 
             self.sendWebAuthToken(signature, from, res.userId);
           }).catch((err) => {
@@ -72,7 +71,6 @@ export default {
           }
         )
         .then((res) => {
-          console.log(res, "res is here");
 
           if (res.loginToken) {
             self.$cookies.set("loginToken", res.loginToken);

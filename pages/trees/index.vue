@@ -1,6 +1,6 @@
 <template>
   <div class="container trees-admin">
-    <div class="row pl-3 pr-3">
+    <div class="row pl-3 pr-3" v-if="trees">
       <div class="users col-12 col-xl-12 col-md-11 offset-md-1 offset-xl-0">
         <div class="row">
           <div class="col-12 py-3 pl-3">
@@ -20,92 +20,35 @@
           </div>
           <div class="col-12 col-md-12 p-0">
             <div class="admin-user-table">
-              <table class="table border-0 dir-ltr">
-                <thead>
-                <tr>
-                  <th scope="col">Number</th>
-
-                  <th scope="col">ID</th>
-
-
-                  <th class="pointer-event" scope="col">
-                    <i class="pointer-event fas fa-sort-up"></i>Plant Date
-                  </th>
-                  <th class="pointer-event" scope="col">
-                    <i class="pointer-event fas fa-sort-up"></i>Planter
-                  </th>
-                  <th class="pointer-event" scope="col">
-                    <i class="pointer-event fas fa-sort-up"></i>TreeSpecsEntity
-                  </th>
-                  <th class="pointer-event" scope="col">
-                    <i class="pointer-event fas fa-sort-up"></i>UpdatedAt
-                  </th>
-
-                  <th class="pointer-event d-none d-md-block" scope="col">
-                    <i class="pointer-event fas fa-sort-up"></i>Show detail
-                  </th>
-                </tr>
-                </thead>
-                <tbody v-if="trees">
-                <tr
-                  v-for="(tree, index) in filterBy(trees, searchAdminUsers)"
-                  :key="index"
-                >
-                  <td scope="row">{{ index + 1 }}</td>
-                  <td scope="row" v-if="tree">
-                    {{$hex2Dec(tree.id)}}
-                  </td>
-                  <td>
-                      <span>{{
-                       $moment(tree.plantDate * 1000).strftime("%Y-%m-%d %I:%M:%S")
-                      }}</span>
-                  </td>
-                  <td>
-                    <span v-coin>{{ tree.planter.id }}</span>
-                  </td>
-                  <td>
-                      <span>
-                        {{
-                          tree.treeSpecsEntity === null ? 'Empty' :tree.treeSpecsEntity
-                        }}
-                      </span>
-                  </td>
-                  <td>
-                      <span>{{
-                      $moment(tree.plantDate * 1000).strftime("%Y-%m-%d %I:%M:%S")
-                      }}</span>
-                  </td>
-                  <!--<td>-->
-                  <!--<button-->
-                  <!--@click.prevent="sendVerifyAndReject(user)"-->
-                  <!--class="btn-state-admin"-->
-                  <!--:class="-->
-                  <!--user.user.isVerified ? 'btn-green' : 'btn-warning'-->
-                  <!--"-->
-                  <!--&gt;-->
-                  <!--{{ user.user.isVerified ? "Verified" : "Pending" }}-->
-                  <!--</button>-->
-                  <!--</td>-->
-                  <td class="d-none d-md-block">
-                  <nuxt-link :to="`/trees/${tree.id}`">
-                  <button class="btn-state-admin btn-green">Info</button>
-                  </nuxt-link>
-                  </td>
-                </tr>
-                </tbody>
-              </table>
-              <div
-                class="
-                  tr-pagination
-                  d-flex
-                  justify-content-center
-                  w-100
-                  position-relative
-                "
+              <b-table
+                striped
+                :current-page="currentPage"
+                :per-page="perPage"
+                :items="items"
+                hover
+                :filter="searchAdminUsers"
+                :fields="fields"
+                id="tree-table"
               >
-
-              </div>
+                <template #cell(Planter)="data">
+                  <span v-coin>{{ data.value }}</span>
+                </template>
+                <template #cell(showDetail)="data">
+                  <nuxt-link :to="`/trees/${data.value}`">
+                    <button class="btn-state-admin btn-green">Info</button>
+                  </nuxt-link>
+                </template>
+              </b-table>
             </div>
+            <b-pagination
+              class="mt-4"
+              v-model="currentPage"
+              :total-rows="totalRows"
+              :per-page="perPage"
+              align="fill"
+              size="sm"
+              aria-controls="tree-table"
+            ></b-pagination>
           </div>
         </div>
       </div>
@@ -113,45 +56,87 @@
   </div>
 </template>
 <script>
-  import Fab from "@/components/font-awsome/Fab";
-  import Vue2Filters from "vue2-filters";
+import Fab from "@/components/font-awsome/Fab";
+import Vue2Filters from "vue2-filters";
 
-  export default {
-    mixins: [Vue2Filters.mixin],
+export default {
+  mixins: [Vue2Filters.mixin],
 
-    name: "trees",
-    layout: "dashboard",
-    loading: false,
-    data() {
-      return {
-        trees: null,
-        searchAdminUsers: "",
-        loadMore: 0
-      };
+  name: "trees",
+  layout: "dashboard",
+  loading: false,
+  data() {
+    return {
+      perPage: 20,
+
+      currentPage: 1,
+      trees: null,
+      searchAdminUsers: "",
+      fields: [
+        { key: "Number" },
+        {
+          key: "id",
+          label: "ID",
+          sortable: true,
+        },
+        {
+          key: "Plant Date",
+          sortable: true,
+        },
+        {
+          key: "Planter",
+          sortable: true,
+        },
+        {
+          key: "TreeSpecsEntity",
+          sortable: true,
+        },
+        {
+          key: "UpdatedAt",
+          sortable: true,
+        },
+        {
+          key: "showDetail",
+          lable: "Show detail",
+        },
+      ],
+      items: [],
+    };
+  },
+  middleware: "auth",
+
+  components: {
+    Fab,
+  },
+
+  async mounted() {
+    await this.getTress();
+
+    this.$nextTick(() => {
+      this.$nuxt.$loading.start();
+      if (this.trees) {
+        this.$nuxt.$loading.finish();
+      } else {
+        this.$nuxt.$loading.fail();
+      }
+    });
+  },
+  computed: {
+    totalRows() {
+      if (this.trees) {
+        return this.trees.length;
+      }
     },
-    middleware: "auth",
+  },
 
-    components: {
-      Fab,
-    },
-
-    async mounted() {
-      await this.getTress();
-
-      this.$nextTick(() => {
-        this.$nuxt.$loading.start();
-        setTimeout(() => this.$nuxt.$loading.finish(), 500);
-      });
-    },
-
-    methods: {
-      async getTress() {
-        let self = this;
-        self.loading = true;
-        await self.$axios
-          .$post(`${process.env.GRAPHQL_URL}`, {
-            query: `{
-             tempTrees(first: 50, skip: ${self.loadMore}, orderBy: createdAt, orderDirection: desc)   {
+  methods: {
+    async getTress() {
+      let self = this;
+      self.loading = true;
+      await self.$axios
+        .$post(`${process.env.GRAPHQL_URL}`, {
+          query: `{
+             tempTrees(orderBy: createdAt, orderDirection: desc)   {
                   id
 	              	planter {id}
 	              	status
@@ -166,148 +151,117 @@
 	              	updatedAt
              }
           }
-          `
-          })
-          .then((res) => {
-            if (res.statusCode) {
-              self.$bvToast.toast(res.code, {
-                variant: "danger",
-                title: "Forbidden",
-                toaster: "b-toaster-bottom-left",
-              });
-            } else {
-              self.trees = res.data.tempTrees;
-              console.log(self.trees, "self.users is here");
-            }
-          })
-          .catch((err) => {
-            self.$bvToast.toast(err.message, {
+          `,
+        })
+        .then((res) => {
+          if (res.statusCode) {
+            self.$bvToast.toast(res.code, {
               variant: "danger",
               title: "Forbidden",
               toaster: "b-toaster-bottom-left",
             });
-          })
-          .finally(() => (self.loading = false));
-      },
-      // async sendVerifyAndReject(user) {
-      //   if (!confirm("Do you really want to change status?")) {
-      //     return;
-      //   }
-      //
-      //   let self = this;
-      //
-      //   const path = user.user.isVerified ? "reject" : "verify";
-      //
-      //   await self.$axios
-      //     .$patch(
-      //       `${process.env.API_URL}/admin/${path}?userid=${user.user._id}`,
-      //       {},
-      //       {
-      //         headers: {
-      //           Accept: "application/json",
-      //           "x-auth-userid": this.$cookies.get("userId"),
-      //           "x-auth-logintoken": this.$cookies.get("loginToken"),
-      //         },
-      //       }
-      //     )
-      //     .then((res) => {
-      //       console.log(res, "res is here");
-      //
-      //       if (res.statusCode) {
-      //         self.$bvToast.toast(res.code, {
-      //           variant: "danger",
-      //           title: "Forbidden",
-      //           toaster: "b-toaster-bottom-left",
-      //         });
-      //       } else {
-      //         this.$bvToast.toast(
-      //           `User status successfully changed to ${
-      //             user.user.isVerified ? "Rejected" : "Verified"
-      //             }`,
-      //           {
-      //             variant: "success",
-      //             title: "Update status successful",
-      //             toaster: "b-toaster-bottom-left",
-      //           }
-      //         );
-      //
-      //         this.getUsers();
-      //       }
-      //     })
-      //     .catch((err) => {
-      //       console.log(err, "err is here");
-      //
-      //       self.$bvToast.toast(err.message, {
-      //         variant: "danger",
-      //         title: "Forbidden",
-      //         toaster: "b-toaster-bottom-left",
-      //       });
-      //     });
-      // },
+          } else {
+            self.trees = res.data.tempTrees;
 
+            self.trees.map((item, index) => {
+              self.items.push({
+                Number: index + 1,
+                id: self.$hex2Dec(item.id),
+                "Plant Date": self
+                  .$moment(item.plantDate * 1000)
+                  .strftime("%Y-%m-%d %I:%M:%S"),
+                Planter: item.planter.id,
+                TreeSpecsEntity:
+                  item.treeSpecsEntity.latitude +
+                  "," +
+                  item.treeSpecsEntity.longitude
+                    ? "latitude:" +
+                      item.treeSpecsEntity.latitude +
+                      "," +
+                      "longitude:" +
+                      item.treeSpecsEntity.longitude
+                    : "Empty",
+                UpdatedAt: self
+                  .$moment(item.updatedAt * 1000)
+                  .strftime("%Y-%m-%d %I:%M:%S"),
+                showDetail: item.id,
+              });
+            });
+          }
+        })
+        .catch((err) => {
+          self.$bvToast.toast(err.message, {
+            variant: "danger",
+            title: "Forbidden",
+            toaster: "b-toaster-bottom-left",
+          });
+        })
+        .finally(() => (self.loading = false));
     },
-  };
+  },
+};
 </script>
 <style lang="scss" scoped>
-  .trees-admin {
+.trees-admin {
+  
+  .search-admin-user {
+    min-width: 100%;
+    background: #e5e7db;
+    border: 2px solid #fff;
+    box-sizing: border-box;
+    border-radius: 18px;
+    padding: 5px 15px;
+    font-size: 14px;
+  }
+  .search-icon {
+    position: absolute;
+    right: 50px;
+    top: 12px;
+  }
+  @media (max-width: 767px) {
+    .search-admin-user-box {
+      width: 100% !important;
+    }
     .search-admin-user {
-      min-width: 100%;
-      background: #e5e7db;
-      border: 2px solid #fff;
-      box-sizing: border-box;
-      border-radius: 18px;
-      padding: 5px 15px;
-      font-size: 14px;
+      font-size: 12px;
     }
     .search-icon {
-      position: absolute;
-      right: 50px;
-      top: 12px;
-    }
-    @media (max-width: 767px) {
-      .search-admin-user-box {
-        width: 100% !important;
-      }
-      .search-admin-user {
-        font-size: 12px;
-      }
-      .search-icon {
-        right: 5px;
-        top: 8px;
-      }
-    }
-    .admin-user-table {
-      position: relative;
-      border: 1px solid #bdbdbd;
-      box-sizing: border-box;
-      border-radius: 12px;
-      margin-bottom: 150px;
-      overflow-x: scroll;
-
-      tr,
-      td,
-      th {
-        border: none;
-        font-size: 14px;
-        line-height: 17px;
-
-        color: #424242;
-      }
-      .table thead {
-        background: #e5e7db;
-      }
-
-      tr th {
-        font-size: 14px;
-        line-height: 17px;
-        color: #757575;
-      }
-      .btn-state-admin {
-        padding: 5px 15px;
-
-        border: none;
-        border-radius: 6px;
-      }
+      right: 5px;
+      top: 8px;
     }
   }
+  .admin-user-table {
+    position: relative;
+    border: 1px solid #bdbdbd;
+    box-sizing: border-box;
+    border-radius: 12px;
+    // margin-bottom: 150px;
+    overflow-x: scroll;
+
+    tr,
+    td,
+    th {
+      border: none;
+      font-size: 14px;
+      line-height: 17px;
+
+      color: #424242;
+    }
+    .table thead {
+      background: #e5e7db;
+    }
+
+    tr th {
+      font-size: 14px;
+      line-height: 17px;
+      color: #757575;
+    }
+    .btn-state-admin {
+      padding: 5px 15px;
+
+      border: none;
+      border-radius: 6px;
+    }
+  }
+}
 </style>

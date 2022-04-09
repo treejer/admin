@@ -1,5 +1,5 @@
 <template>
-  <div class="container users-admin">
+  <div class="container users-admin" v-if="users">
     <div class="row">
       <div class="users col-12 col-xl-12 col-md-11 offset-md-1 offset-xl-0">
         <div class="row">
@@ -20,103 +20,36 @@
           </div>
           <div class="col-12 col-md-12 mt-4">
             <div class="admin-user-table">
-              <table class="table border-0 dir-ltr">
-                <thead>
-                  <tr>
-                    <th scope="col" class="d-none d-md-block">Number</th>
-
-                    <th scope="col">ID</th>
-
-                    <th class="pointer-event" scope="col">
-                      <i class="pointer-event fas fa-sort-up"></i>Name
-                    </th>
-
-                    <th class="pointer-event" scope="col">
-                      <i class="pointer-event fas fa-sort-up"></i>Wallet
-                    </th>
-                    <th class="pointer-event" scope="col">
-                      <i class="pointer-event fas fa-sort-up"></i>CreatedAt
-                    </th>
-
-                    <th class="pointer-event" scope="col">
-                      <i class="pointer-event fas fa-sort-up"></i>Status
-                    </th>
-
-                    <th class="pointer-event d-none d-md-block" scope="col">
-                      <i class="pointer-event fas fa-sort-up"></i>Show detail
-                    </th>
-                  </tr>
-                </thead>
-                <tbody v-if="users">
-                  <tr
-                    v-for="(user, index) in filterBy(users, searchAdminUsers)"
-                    :key="index"
-                  >
-                    <td scope="row" class="d-none d-md-block">
-                      {{ index + 1 }}
-                    </td>
-                    <td scope="row" v-if="user.user._id">
-                      {{ user.user._id }}
-                    </td>
-                    <td>
-                      <nuxt-link :to="`/users/${user.user._id}`">
-                        <span>
-                          {{
-                            user.user.firstName + " " + user.user.lastName
-                          }}</span
-                        >
-                      </nuxt-link>
-                    </td>
-                    <td>
-                      <span v-coin>{{ user.user.publicAddress }}</span>
-                    </td>
-                    <td>
-                      <span>
-                        {{
-                          $moment(user.user.createdAt).strftime(
-                            "%Y-%m-%d %I:%M:%S"
-                          )
-                        }}
-                      </span>
-                    </td>
-
-                    <td>
-                      <span
-                        class="btn-state-admin"
-                        :class="
-                          user.user.isVerified ? 'btn-green' : 'btn-warning'
-                        "
-                      >
-                        {{ user.user.isVerified ? "Verified" : "Pending" }}
-                      </span>
-                    </td>
-
-                    <td class="d-none d-md-block">
-                      <nuxt-link :to="`/users/${user.user._id}`">
-                        <button class="btn-state-admin btn-green">Info</button>
-                      </nuxt-link>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              <div
-                class="
-                  tr-pagination
-                  d-flex
-                  justify-content-center
-                  w-100
-                  position-relative
-                "
+              <b-table
+                striped
+                :current-page="currentPage"
+                :per-page="perPage"
+                :items="items"
+                hover
+                :filter="searchAdminUsers"
+                :fields="fields"
+                id="tree-table"
               >
-                <!-- <pagination
-                  size="small"
-                  align="center"
-                  :limit="2"
-                  :data="trees"
-                  @pagination-change-page="listTrees"
-                ></pagination> -->
-              </div>
+                <template #cell(Wallet)="data">
+                  <span v-coin>{{ data.value }}</span>
+                </template>
+               
+                <template #cell(showDetail)="data">
+                  <nuxt-link :to="`/users/${data.value}`">
+                    <button class="btn-state-admin btn-green">Info</button>
+                  </nuxt-link>
+                </template>
+              </b-table>
             </div>
+            <b-pagination
+              class=""
+              v-model="currentPage"
+              :total-rows="totalRows"
+              :per-page="perPage"
+              align="fill"
+              size="sm"
+              aria-controls="tree-table"
+            ></b-pagination>
           </div>
         </div>
       </div>
@@ -136,7 +69,39 @@ export default {
   data() {
     return {
       users: null,
+      perPage: 20,
+
+      currentPage: 1,
+      trees: null,
       searchAdminUsers: "",
+      fields: [
+        { key: "Number" },
+        {
+          key: "id",
+          label: "ID",
+          sortable: true,
+        },
+        {
+          key: "name",
+          label: "Name",
+          sortable: true,
+        },
+        {
+          key: "Wallet",
+          sortable: true,
+        },
+        {
+          key: "CreatedAt",
+          sortable: true,
+        },
+
+
+        {
+          key: "showDetail",
+          lable: "Show detail",
+        },
+      ],
+      items: [],
     };
   },
   middleware: "auth",
@@ -156,19 +121,26 @@ export default {
       }
     });
   },
+  computed: {
+    totalRows() {
+      if (this.users) {
+        return this.users.length;
+      }
+    },
+  },
 
   methods: {
     async getUsers() {
       let self = this;
       self.loading = true;
       await this.$axios
-        .$get(`${process.env.API_URL}/admin/users?filters={}`,{
-            headers: {
-              Accept: "application/json",
-              "x-auth-userid": self.$cookies.get("userId"),
-              "x-auth-logintoken": self.$cookies.get("loginToken"),
-            },
-          })
+        .$get(`${process.env.API_URL}/admin/users?filters={}`, {
+          headers: {
+            Accept: "application/json",
+            "x-auth-userid": self.$cookies.get("userId"),
+            "x-auth-logintoken": self.$cookies.get("loginToken"),
+          },
+        })
         .then((res) => {
           if (res.statusCode) {
             self.$bvToast.toast(res.code, {
@@ -178,7 +150,19 @@ export default {
             });
           } else {
             self.users = res;
-            console.log(self.users, "self.users is here");
+            self.users.map((item, index) => {
+              self.items.push({
+                Number: index + 1,
+                id: item.user._id,
+                name: item.user.firstName + " " + item.user.lastName,
+                Wallet: item.user.publicAddress,
+                CreatedAt: self
+                  .$moment(item.user.createdAt )
+                  .strftime("%Y-%m-%d %I:%M:%S"),
+                Status: item.user.isVerified,
+                showDetail: item.user._id,
+              });
+            });
           }
         })
         .catch((err) => {
@@ -226,7 +210,7 @@ export default {
     border: 1px solid #bdbdbd;
     box-sizing: border-box;
     border-radius: 12px;
-    margin-bottom: 150px;
+    margin-bottom: 25px;
     overflow-x: scroll;
 
     tr,
