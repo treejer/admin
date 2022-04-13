@@ -15,7 +15,9 @@
       </li>
       <li class="nav-item pointer-event temptrees" @click="changeIndex(2)">
         <nuxt-link to="/tempTrees">
-          <TemptreesIcon :activeLogo="$store.state.index === 2 ? true : false" />
+          <TemptreesIcon
+            :activeLogo="$store.state.index === 2 ? true : false"
+          />
         </nuxt-link>
       </li>
       <li class="nav-item pointer-event sheild" @click="changeIndex(3)">
@@ -41,7 +43,7 @@ export default {
       checkSidbar: true,
     };
   },
- async created() {
+  async created() {
     if (await !this.$cookies.get("setSidebarIndex")) {
       this.$store.commit("SET_SIDEBAR_INDEX", 0);
     } else {
@@ -54,8 +56,13 @@ export default {
 
   methods: {
     changeIndex(id) {
-      this.$store.commit("SET_SIDEBAR_INDEX", id);
-      this.$cookies.set("setSidebarIndex", id);
+      if (!this.$cookies.get("loginToken")) {
+        this.$router.push("/");
+        this.$store.commit("SET_SIDEBAR_INDEX", 0);
+      } else {
+        this.$store.commit("SET_SIDEBAR_INDEX", id);
+        this.$cookies.set("setSidebarIndex", id);
+      }
     },
   },
 };

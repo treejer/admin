@@ -29,11 +29,19 @@
                 :filter="searchAdminUsers"
                 :fields="fields"
                 id="tree-table"
+                class="param tr-gray-three"
               >
                 <template #cell(Wallet)="data">
                   <span v-coin>{{ data.value }}</span>
                 </template>
-               
+                <template #cell(Status)="data">
+                  <button
+                    class="btn-state-admin"
+                    :class="data.value ? 'btn-green' : 'btn-warning'"
+                  >
+                    {{ data.value ? "Accept" : "Pending" }}
+                  </button>
+                </template>
                 <template #cell(showDetail)="data">
                   <nuxt-link :to="`/users/${data.value}`">
                     <button class="btn-state-admin btn-green">Info</button>
@@ -94,7 +102,9 @@ export default {
           key: "CreatedAt",
           sortable: true,
         },
-
+        {
+          key: "Status",
+        },
 
         {
           key: "showDetail",
@@ -157,7 +167,7 @@ export default {
                 name: item.user.firstName + " " + item.user.lastName,
                 Wallet: item.user.publicAddress,
                 CreatedAt: self
-                  .$moment(item.user.createdAt )
+                  .$moment(item.user.createdAt)
                   .strftime("%Y-%m-%d %I:%M:%S"),
                 Status: item.user.isVerified,
                 showDetail: item.user._id,
@@ -219,7 +229,7 @@ export default {
       border: none;
       font-size: 14px;
       line-height: 17px;
-
+      white-space: nowrap;
       color: #424242;
     }
     .table thead {

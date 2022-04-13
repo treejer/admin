@@ -171,16 +171,7 @@ export default {
                   .$moment(item.plantDate * 1000)
                   .strftime("%Y-%m-%d %I:%M:%S"),
                 Planter: item.planter.id,
-                TreeSpecsEntity:
-                  item.treeSpecsEntity.latitude +
-                  "," +
-                  item.treeSpecsEntity.longitude
-                    ? "latitude:" +
-                      item.treeSpecsEntity.latitude +
-                      "," +
-                      "longitude:" +
-                      item.treeSpecsEntity.longitude
-                    : "Empty",
+                TreeSpecsEntity:item.treeSpecsEntity && item.treeSpecsEntity.latitude &&  item.treeSpecsEntity.longitude ? item.treeSpecsEntity.latitude +"," +item.treeSpecsEntity.longitude: "Empty",
                 UpdatedAt: self
                   .$moment(item.updatedAt * 1000)
                   .strftime("%Y-%m-%d %I:%M:%S"),
