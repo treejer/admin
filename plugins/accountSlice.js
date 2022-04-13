@@ -3,7 +3,6 @@ import Vue from 'vue';
 
  const coin = {
   bind(el) {
-    if(el.innerText.length > 12){
       let sliceAccount = ''
       const account = el.innerText.split('')
       const firstRow = account.slice(0, 5)
@@ -13,7 +12,6 @@ import Vue from 'vue';
       accountArrayFinal.map(item => item !== null ? sliceAccount += item.toString() : null)
       return  el.innerText = sliceAccount
 
-    }
 
   }
 }
