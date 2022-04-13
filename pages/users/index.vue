@@ -1,7 +1,7 @@
 <template>
   <div class="container users-admin" v-if="users">
     <div class="row">
-      <div class="users col-12 col-xl-12 col-md-11 offset-md-1 offset-xl-0">
+      <div class="users col-12 col-xl-12 col-lg-11 offset-lg-1 offset-xl-0">
         <div class="row">
           <div class="col-12 py-3 pl-3">
             <h4 class="title-sm tr-gray-one text-left">Planters</h4>

@@ -1,7 +1,7 @@
 <template>
   <div class="container trees-admin">
     <div class="row pl-3 pr-3" v-if="trees">
-      <div class="users col-12 col-xl-12 col-md-11 offset-md-1 offset-xl-0">
+      <div class="users col-12 col-xl-12 col-lg-11 offset-lg-1 offset-xl-0">
         <div class="row">
           <div class="col-12 py-3 pl-3">
             <h4 class="title-sm tr-gray-one text-left">Trees</h4>
@@ -25,6 +25,7 @@
                 :current-page="currentPage"
                 :per-page="perPage"
                 :items="items"
+                class="param tr-gray-three"
                 hover
                 :filter="searchAdminUsers"
                 :fields="fields"

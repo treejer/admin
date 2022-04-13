@@ -292,24 +292,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.metamask {
-  .switch-wallet {
-   
-  }
 
-  @media screen and (max-width: 767px) {
-    .switch-wallet {
-      margin-right: 0;
-      width: 80px;
-      position: absolute;
-      left: 80px;
-      z-index: +10;
-      padding: 0;
-    }
-
-    .tree {
-      margin: 0;
-    }
-  }
-}
 </style>
