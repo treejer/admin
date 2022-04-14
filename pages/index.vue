@@ -1,7 +1,9 @@
 <template>
   <div class="container">
     <div class="row">
-      <div class="col-12 col-xl-9 col-lg-8 offset-lg-1 offset-xl-0 admin-left-side">
+      <div
+        class="col-12 col-xl-9 col-lg-8 offset-lg-1 offset-xl-0 admin-left-side"
+      >
         <div class="row">
           <div class="col-12">
             <ul class="">
@@ -41,6 +43,11 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <AdminMap />
           </div>
         </div>
       </div>
@@ -84,6 +91,7 @@
 
 <script>
 import LineChart from "~/plugins/lineChart";
+import AdminMap from "@/components/AdminMap";
 import Vue2Filters from "vue2-filters";
 import web3 from "~/plugins/web3";
 
@@ -93,6 +101,7 @@ export default {
 
   components: {
     LineChart,
+    AdminMap,
   },
 
   name: "dashboard",
