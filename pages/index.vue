@@ -22,7 +22,7 @@
               </li>
             </ul>
           </div>
-          <div class="col-12 col-md-11 justify-content-center text-left mt-5">
+          <div v-if="tabsIndex === 0"  class="col-12 col-md-11 justify-content-center text-left mt-5">
             <div class="small">
               <div class="header-tab position-relative pb-3">
                 <div class="row">
@@ -44,12 +44,11 @@
               </div>
             </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="col-12">
+          <div v-if="tabsIndex === 1" class="col-12 col-md-11 mt-5">
             <AdminMap />
           </div>
         </div>
+
       </div>
       <div class="col-12 col-xl-3 col-lg-3 admin-right-side pl-md-0 mt-md-5">
         <div class="cards">
@@ -276,7 +275,7 @@ export default {
     },
   },
 };
-</script> 
+</script>
 
 <style lang="scss" scoped>
 .admin-left-side {

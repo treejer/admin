@@ -35,7 +35,7 @@
               Reject
           </button>
 
-          
+
         </div>
 
         <h2 class="title tr-gray-two mb-md-4 font-weight-bolder">Tree Info</h2>
@@ -61,7 +61,7 @@
                         }}</span>
         </p>
 
-       
+
       <p>
           Plant date: <span>{{
                           $moment(tree.plantDate * 1000).strftime(
@@ -74,7 +74,7 @@
         </p>
 
         <div v-if="planterData">
-          
+
           <p>
             Planter Name: <a :href="`/users/${planterData.user._id}`" target="_blank">{{ planterData.user.firstName + " " + planterData.user.lastName }}</a>
           </p>
@@ -86,7 +86,7 @@
           Status:
           <span>{{
           tree.status
-          
+
           }}</span>
         </p>
         <p>
@@ -117,19 +117,19 @@
               Nursery: {{ tree.treeSpecsEntity.nursery ? 'Yes' : 'No' }}
             </p>
 
-            
+
             <img v-for="(update, index) in tree.treeSpecsEntity.updates" :key="`update-${index}`" width="400px"  :src="update.image" :alt="`update-${index}`">
-            
+
 
         </div>
 
 
-         
+
         </div>
       </div>
       </div>
     </div>
-  </div>
+
 </template>
 <script>
 import TreeFactoryABI from "~/static/abis/TreeFactory.json";

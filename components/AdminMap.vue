@@ -33,7 +33,7 @@
       @click="currentLocation = tree"
     >
       <GMapInfoWindow :options="{ maxWidth: 200 }">
-        <nuxt-link :to="`trees/0x${index}`">
+        <nuxt-link :to="`tempTrees/0x${index}`">
           <b>{{ '0x'+index }} </b>
           <br />
           <br />

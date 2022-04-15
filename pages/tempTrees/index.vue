@@ -7,7 +7,8 @@
             <h4 class="title-sm tr-gray-one text-left">Trees</h4>
             <div class="position-relative w-50 search-admin-user-box">
               <input
-                class="search-admin-user"
+
+                class=" search-admin-user"
                 v-model="searchAdminUsers"
                 placeholder="Search by Id or planter address"
               />
@@ -195,7 +196,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .trees-admin {
-  
+
   .search-admin-user {
     min-width: 100%;
     background: #e5e7db;
