@@ -302,7 +302,8 @@
             Status: <span> {{ userDetails.application.status }}</span>
           </p>
           <p>
-            Type: <span> {{ userDetails.application.type }}</span>
+            Type:
+            <span> {{ userDetails.application.type }} - {{ userDetails.application.type === 1 ? "Planter" : (userDetails.application.type === 2 ? "Organization" : "Member of Organization" ) }}</span>
           </p>
         </div>
       </div>
@@ -462,10 +463,10 @@ export default {
 
       const path = this.userDetails.user.isVerified ? "reject" : "verify";
 
-      console.log(path,this.roleGranted,this.planterStatus)
+      console.log(path,this.roleGranted,this.planterStatus,typeof this.roleGranted,typeof  this.planterStatus)
 
 
-      if (path == 'verify' && (this.roleGranted === false || this.planterStatus !== 1)) {
+      if (path === 'verify' && (this.roleGranted === false || this.planterStatus !== 1)) {
         this.$bvToast.toast("This planter not exist on planter contract", {
           variant: "danger",
           title: "Not planter",
@@ -544,7 +545,7 @@ export default {
         .planters(this.txData.publicAddress)
         .call()
         .then(function (result) {
-          self.planterStatus = result.status;
+          self.planterStatus = Number(result.status);
         });
 
       await this.AccessRestrictionContract.methods
