@@ -2,55 +2,86 @@
   <div class="container trees-admin">
     <div class="row pl-3 pr-3" v-if="trees">
       <div class="users col-12 col-xl-12 col-lg-11 offset-lg-1 offset-xl-0">
-        <div class="row">
-          <div class="col-12 py-3 pl-3">
-            <h4 class="title-sm tr-gray-one text-left">Trees</h4>
-            <div class="position-relative w-50 search-admin-user-box">
-              <input
-
-                class=" search-admin-user"
-                v-model="searchAdminUsers"
-                placeholder="Search by Id or planter address"
-              />
-              <img
-                src="~/assets/images/tree-profile/search.svg"
-                alt="search"
-                class="search-icon"
-              />
+        <div class="header-tab position-relative pb-3">
+          <div class="row">
+            <div class="col-md-12">
+              <p class="param-md">Overview</p>
+              <p class="title-sm font-weight-bolder">{{ tabName }}</p>
             </div>
           </div>
-          <div class="col-12 col-md-12 p-0">
-            <div class="admin-user-table">
-              <b-table
-                striped
-                :current-page="currentPage"
-                :per-page="perPage"
-                :items="items"
-                class="param tr-gray-three"
-                hover
-                :filter="searchAdminUsers"
-                :fields="fields"
-                id="tree-table"
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <ul class="">
+              <li
+                class="d-inline-block list-style-none pr-2 pb-2"
+                v-for="(item, index) in tabs"
+                :key="index"
               >
-                <template #cell(Planter)="data">
-                  <span v-coin>{{ data.value }}</span>
-                </template>
-                <template #cell(showDetail)="data">
-                  <nuxt-link :to="`/tempTrees/${data.value}`">
-                    <button class="btn-state-admin btn-green">Info</button>
-                  </nuxt-link>
-                </template>
-              </b-table>
+                <button
+                  @click="setIndex(item.text, index)"
+                  :class="tabsIndex === index ? 'btn-green' : 'btn-gray'"
+                  :key="index"
+                >
+                  {{ item.text }}
+                </button>
+              </li>
+            </ul>
+          </div>
+          <div v-show="tabsIndex === 0" class="row">
+            <div class="col-12 py-3 pl-3">
+              <h4 class="title-sm tr-gray-one text-left">Trees</h4>
+              <div class="position-relative w-50 search-admin-user-box">
+                <input
+                  class="search-admin-user"
+                  v-model="searchAdminUsers"
+                  placeholder="Search by Id or planter address"
+                />
+                <img
+                  src="~/assets/images/tree-profile/search.svg"
+                  alt="search"
+                  class="search-icon"
+                />
+              </div>
             </div>
-            <b-pagination
-              class="mt-4"
-              v-model="currentPage"
-              :total-rows="totalRows"
-              :per-page="perPage"
-              align="fill"
-              size="sm"
-              aria-controls="tree-table"
-            ></b-pagination>
+            <div class="col-12 col-md-12 p-0">
+              <div class="admin-user-table">
+                <b-table
+                  striped
+                  :current-page="currentPage"
+                  :per-page="perPage"
+                  :items="items"
+                  class="param tr-gray-three"
+                  hover
+                  :filter="searchAdminUsers"
+                  :fields="fields"
+                  id="tree-table"
+                >
+                  <template #cell(Planter)="data">
+                    <span v-coin>{{ data.value }}</span>
+                  </template>
+                  <template #cell(showDetail)="data">
+                    <nuxt-link :to="`/tempTrees/${data.value}`">
+                      <button class="btn-state-admin btn-green">Info</button>
+                    </nuxt-link>
+                  </template>
+                </b-table>
+              </div>
+              <b-pagination
+                class="mt-4"
+                v-model="currentPage"
+                :total-rows="totalRows"
+                :per-page="perPage"
+                align="fill"
+                size="sm"
+                aria-controls="tree-table"
+              ></b-pagination>
+            </div>
+          </div>
+          <div v-show="tabsIndex === 1"  class="col-12">
+            <div class="col-12 col-md-11 mt-5">
+              <AdminMap />
+            </div>
           </div>
         </div>
       </div>
@@ -60,15 +91,28 @@
 <script>
 import Fab from "@/components/font-awsome/Fab";
 import Vue2Filters from "vue2-filters";
-
+import AdminMap from "@/components/AdminMap";
 export default {
   mixins: [Vue2Filters.mixin],
-
+  components: {
+    Fab,
+    AdminMap,
+  },
   name: "trees",
   layout: "dashboard",
   loading: false,
   data() {
     return {
+      tabs: [
+        {
+          text: "Tree Funding Volume",
+        },
+        {
+          text: "Tree Planing Volume",
+        },
+      ],
+      tabsIndex: 0,
+      tabName: "Tree Funding Volume",
       perPage: 20,
 
       currentPage: 1,
@@ -107,10 +151,6 @@ export default {
   },
   middleware: "auth",
 
-  components: {
-    Fab,
-  },
-
   async mounted() {
     await this.getTress();
 
@@ -138,7 +178,7 @@ export default {
       await self.$axios
         .$post(`${process.env.GRAPHQL_URL}`, {
           query: `{
-             tempTrees(orderBy: createdAt, orderDirection: desc)   {
+             tempTrees(first:999,orderBy: createdAt, orderDirection: desc)   {
                   id
 	              	planter {id}
 	              	status
@@ -173,7 +213,14 @@ export default {
                   .$moment(item.plantDate * 1000)
                   .strftime("%Y-%m-%d %I:%M:%S"),
                 Planter: item.planter.id,
-                TreeSpecsEntity:item.treeSpecsEntity && item.treeSpecsEntity.latitude &&  item.treeSpecsEntity.longitude ? item.treeSpecsEntity.latitude +"," +item.treeSpecsEntity.longitude: "Empty",
+                TreeSpecsEntity:
+                  item.treeSpecsEntity &&
+                  item.treeSpecsEntity.latitude &&
+                  item.treeSpecsEntity.longitude
+                    ? item.treeSpecsEntity.latitude +
+                      "," +
+                      item.treeSpecsEntity.longitude
+                    : "Empty",
                 UpdatedAt: self
                   .$moment(item.updatedAt * 1000)
                   .strftime("%Y-%m-%d %I:%M:%S"),
@@ -191,11 +238,18 @@ export default {
         })
         .finally(() => (self.loading = false));
     },
+    setIndex(item, index) {
+      this.tabsIndex = index;
+      this.tabName = item;
+    },
   },
 };
 </script>
 <style lang="scss" scoped>
 .trees-admin {
+  .btn-green {
+    padding: 5.5px 35px;
+  }
 
   .search-admin-user {
     min-width: 100%;

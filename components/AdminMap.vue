@@ -3,8 +3,8 @@
     v-if="trees"
     ref="gMap"
     :center="{
-      lat: Number(locations[0].lat / Math.pow(10, 6)),
-      lng: Number(locations[0].lng / Math.pow(10, 6)),
+      lat: Number(locations[0].lat),
+      lng: Number(locations[0].lng),
     }"
     :cluster="{ options: { styles: mapConfigData.clusterStyle } }"
     :options="{
@@ -15,11 +15,11 @@
       gestureHandling: 'cooperative',
       styles: mapConfigData.mapStyle,
     }"
-    :zoom="6"
+    :zoom="5"
   >
     <GMapMarker
       v-for="(tree ,index) in locations"
-      :key="$hex2Dec(tree.id)"
+      :key="index"
       :options="{
         icon:
           tree === currentLocation
@@ -27,8 +27,8 @@
             : mapConfigData.pins.notSelected,
       }"
       :position="{
-        lat: Number(tree.lat / Math.pow(10, 6)),
-        lng: Number(tree.lng / Math.pow(10, 6)),
+        lat: Number(tree.lat),
+        lng: Number(tree.lng),
       }"
       @click="currentLocation = tree"
     >
@@ -39,10 +39,10 @@
           <br />
           <code>
             Lat:
-            {{ Number(tree.lat / Math.pow(10, 6)) }},
+            {{ Number(tree.lat) }},
             <br />
             Lng:
-            {{ Number(tree.lng / Math.pow(10, 6)) }}
+            {{ Number(tree.lng) }}
           </code>
         </nuxt-link>
       </GMapInfoWindow>
@@ -116,8 +116,8 @@ export default {
           } else {
             self.trees = res.data.tempTrees;
             console.log(
-              Number(self.trees[0].treeSpecsEntity.latitude / Math.pow(10, 6)),
-              " Number(self.trees[0].treeSpecsEntity.latitude / Math.pow(10, 6)) is here"
+              Number(self.trees[0].treeSpecsEntity.latitude),
+              " Number(self.trees[0].treeSpecsEntity.latitude) is here"
             );
 
             console.log(self.trees, "self.trees is");

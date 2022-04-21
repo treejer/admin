@@ -5,35 +5,10 @@
         class="col-12 col-xl-9 col-lg-8 offset-lg-1 offset-xl-0 admin-left-side"
       >
         <div class="row">
-          <div class="col-12">
-            <ul class="">
-              <li
-                class="d-inline-block list-style-none pr-2 pb-2"
-                v-for="(item, index) in tabs"
-                :key="index"
-              >
-                <button
-                  @click="setIndex(item.text, index)"
-                  :class="tabsIndex === index ? 'btn-green' : 'btn-gray'"
-                  :key="index"
-                >
-                  {{ item.text }}
-                </button>
-              </li>
-            </ul>
-          </div>
-          <div v-if="tabsIndex === 0"  class="col-12 col-md-11 justify-content-center text-left mt-5">
-            <div class="small">
-              <div class="header-tab position-relative pb-3">
-                <div class="row">
-                  <div class="col-md-12">
-                    <p class="param-md">Overview</p>
-                    <p class="title-sm font-weight-bolder">{{ tabName }}</p>
-                  </div>
-                </div>
-              </div>
-              <div class="row line-chart">
-                <div class="col-md-12">
+          <div class="col-12 col-md-11 justify-content-center text-left mt-5">
+            <div class="row line-chart">
+              <div class="col-md-12">
+                <div class="cards">
                   <iframe
                     src="https://dune.xyz/embeds/395828/755409/2d131dd7-a565-4ae6-875c-4d7bee163bf2"
                     height="500"
@@ -44,11 +19,7 @@
               </div>
             </div>
           </div>
-          <div v-if="tabsIndex === 1" class="col-12 col-md-11 mt-5">
-            <AdminMap />
-          </div>
         </div>
-
       </div>
       <div class="col-12 col-xl-3 col-lg-3 admin-right-side pl-md-0 mt-md-5">
         <div class="cards">
@@ -89,190 +60,16 @@
 </template>
 
 <script>
-import LineChart from "~/plugins/lineChart";
-import AdminMap from "@/components/AdminMap";
-import Vue2Filters from "vue2-filters";
-import web3 from "~/plugins/web3";
-
 export default {
-  mixins: [Vue2Filters.mixin],
   loading: false,
-
-  components: {
-    LineChart,
-    AdminMap,
-  },
-
   name: "dashboard",
   layout: "dashboard",
-
-  data() {
-    return {
-      totalEthLocked: null,
-      downloads: null,
-      totalO1Supply: null,
-      labels: null,
-      tabs: [
-        {
-          text: "Tree Funding Volume",
-        },
-        {
-          text: "Tree Planing Volume",
-        },
-        // {
-        //   text: "User Acquisition",
-        // },
-        // {
-        //   text: "Planter Acquisition",
-        // },
-        // {
-        //   text: "Green Block Growth",
-        // },
-        // {
-        //   text: "O1 Supply",
-        // },
-        // {
-        //   text: "O2 Supply",
-        // },
-      ],
-      tabsIndex: 0,
-      allStats: null,
-      tabName: "Tree Funding Growth",
-      cards: [
-        {
-          text: "Total Funding (ETH)",
-          count: "348.2355",
-        },
-        {
-          text: "Total Locked in Escrow (ETH)",
-          count: "225.7482",
-        },
-        {
-          text: "Total Released to Planters (ETH)",
-          count: "122.4873",
-        },
-        {
-          text: "Tree Supply",
-          count: "56,264",
-        },
-        {
-          text: "O1 Supply",
-          count: "234,343,872",
-        },
-        {
-          text: "O2 Supply",
-          count: "432,512",
-        },
-        {
-          text: "Total Users",
-          count: "8,539",
-        },
-      ],
-      dataCollection: null,
-      groupData: null,
-      chartOptions: {
-        responsive: true,
-        maintainAspectRatio: false,
-      },
-    };
-  },
   computed: {},
   mounted() {
     this.$nextTick(() => {
       this.$nuxt.$loading.start();
       setTimeout(() => this.$nuxt.$loading.finish(), 500);
     });
-    this.fetchStats();
-    this.fetchPlantedChartData();
-  },
-
-  methods: {
-    setIndex(item, index) {
-      this.tabsIndex = index;
-      this.tabName = item;
-      if (index === 0) {
-        this.fetchPlantedChartData();
-      }
-      if (index === 1) {
-        this.fetchFundedChartData();
-      }
-    },
-    fetchStats() {
-      let self = this;
-
-      self.$axios.get(`https://api.treejer.com/trees/stats`).then((res) => {
-        self.allStats = res.data;
-        self.totalEthLocked = res.data.total_eth_locked;
-        self.totalO1Supply = res.data.total_o1_supply;
-        self.totalEthLocked = web3.utils.fromWei(res.data.total_eth_locked);
-        self.totalO1Supply = web3.utils.fromWei(res.data.total_o1_supply);
-        console.log(self.totalEthLocked, "self.totalEthLocked");
-
-        console.log("self.allStats", self.allStats);
-      });
-    },
-    fetchPlantedChartData() {
-      let self = this;
-      let api = "https://api.treejer.com/trees/plantedChartData?howMany=12";
-      this.$axios
-        .get(api)
-        .then((res) => {
-          self.dataCollection = res.data;
-          self.labels = res.data.map((item) => {
-            return item.labels;
-          });
-          self.downloads = res.data.map((item) => {
-            return item.count;
-          });
-          self.fillData();
-        })
-        .catch()
-        .finally();
-    },
-    fetchFundedChartData() {
-      let self = this;
-      let api = "https://api.treejer.com/trees/fundedChartData?howMany=12";
-      this.$axios
-        .get(api)
-        .then((res) => {
-          self.dataCollection = res.data;
-          self.labels = res.data.map((item) => {
-            return item.labels;
-          });
-          self.downloads = res.data.map((item) => {
-            return item.count;
-          });
-          self.fillData();
-        })
-        .catch()
-        .finally();
-    },
-    fillData() {
-      if (this.downloads) {
-        this.groupData = {
-          layout: {
-            padding: {
-              left: 15,
-              right: 15,
-              top: 15,
-              bottom: 15,
-            },
-          },
-          labels: this.labels,
-          datasets: [
-            {
-              label: this.tabName,
-              borderCapStyle: "butt",
-              borderColor: "#67B68C",
-              backgroundColor: "rgba(255, 255, 255, 0.1)",
-              capBezierPoints: true,
-              pointBackgroundColor: "rgba(0, 0, 0, 0.1)",
-              data: this.downloads,
-            },
-          ],
-        };
-      }
-    },
   },
 };
 </script>
@@ -280,31 +77,30 @@ export default {
 <style lang="scss" scoped>
 .admin-left-side {
   margin-bottom: 150px;
-  .btn-green {
-    padding: 5.5px 35px;
-  }
-
-  .small {
+  .line-chart {
+    padding: 30px;
+    margin: 15px 15px;
     position: relative;
-    background: #ffffff;
-    box-shadow: 2px 4px 44px rgba(0, 0, 0, 0.1);
-    border-radius: 12px;
-    .header-tab {
-      padding: 15px 32px;
-      border-bottom: 4px solid #e5e7db;
-    }
-    .line-chart {
+    iframe {
+      border: none;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      min-height: 107px;
+      background: #ffffff;
+      box-shadow: 2px 4px 42px rgba(0, 0, 0, 0.1);
+      border-radius: 6px;
+      align-self: center;
+      margin-bottom: 32px;
       padding: 30px;
       margin: 15px 15px;
+       font-family: Montserrat-Medium;
       position: relative;
-      iframe {
-        border: none;
-        a,
-        span,
-        p,
-        div {
-          font-family: Montserrat-Medium;
-        }
+      a,
+      span,
+      p,
+      div {
+        font-family: Montserrat-Medium;
       }
     }
   }
@@ -327,11 +123,13 @@ export default {
     position: relative;
     iframe {
       border: none;
+       font-family: Montserrat-Medium;
       a,
       span,
       p,
       div {
         font-family: Montserrat-Medium;
+        
       }
     }
   }
