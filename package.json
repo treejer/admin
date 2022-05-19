@@ -36,6 +36,7 @@
     "ethjs": "^0.4.0",
     "express": "^4.15.3",
     "express-session": "^1.17.1",
+    "file-saver": "^2.0.5",
     "fortmatic": "^2.2.1",
     "fs": "0.0.1-security",
     "moment": "^2.29.1",
@@ -65,6 +66,6 @@
     "eslint": "^6.1.0",
     "eslint-plugin-nuxt": "^1.0.0",
     "node-sass": "^4.14.1",
-    "sass-loader": "^8.0.2"
+    "sass-loader": "^10.1.1"
   }
 }

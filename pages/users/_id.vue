@@ -59,7 +59,6 @@
             hide-footer
             title="Verification Detail"
             v-if="txData"
-            
           >
             <p>
               Role: (Byte32)
@@ -133,12 +132,9 @@
               {{ userDetails.user.isVerified ? "Reject" : "Verify" }} Offchain
             </button>
 
-            <div class="row" v-if="loginedUserIsAdmin">  
+            <div class="row" v-if="loginedUserIsAdmin">
               <div class="col-12">
-                <h4>
-                  Regular trasanctions
-                </h4>
-                
+                <h4>Regular trasanctions</h4>
 
                 <button
                   v-if="this.roleGranted === false"
@@ -146,10 +142,15 @@
                   class="btn-green-md mt-1 mb-1"
                   @click="grantPlanterRole()"
                 >
-                  <BSpinner v-if="loading.grantPlanterRole" class="mr-2" small type="grow">loading.grantPlanterRole</BSpinner>
-                    Grant Planter Role
+                  <BSpinner
+                    v-if="loading.grantPlanterRole"
+                    class="mr-2"
+                    small
+                    type="grow"
+                    >loading.grantPlanterRole</BSpinner
+                  >
+                  Grant Planter Role
                 </button>
-
 
                 <button
                   v-if="this.planterStatus !== 1"
@@ -157,18 +158,21 @@
                   class="btn-green-md mt-1 mb-1"
                   @click="joinPlanter()"
                 >
-                  <BSpinner v-if="loading.joinPlanter" class="mr-2" small type="grow">loading.joinPlanter</BSpinner>
-                    Join Planter
+                  <BSpinner
+                    v-if="loading.joinPlanter"
+                    class="mr-2"
+                    small
+                    type="grow"
+                    >loading.joinPlanter</BSpinner
+                  >
+                  Join Planter
                 </button>
 
-
-                <h4>
-                  Grant High Level roles
-                </h4>
+                <h4>Grant High Level roles</h4>
 
                 <p>
                   Role:
-                   <select v-model="selectedRole">
+                  <select v-model="selectedRole">
                     <option value="verifier">Verifier</option>
                     <option value="datamanager">Data Manager</option>
                     <option value="admin">Admin</option>
@@ -180,15 +184,16 @@
                   class="btn-green-md mt-1 mb-1"
                   @click="granHighLevelRole()"
                 >
-                  <BSpinner v-if="loading.granHighLevelRole" class="mr-2" small type="grow">loading.granHighLevelRole</BSpinner>
+                  <BSpinner
+                    v-if="loading.granHighLevelRole"
+                    class="mr-2"
+                    small
+                    type="grow"
+                    >loading.granHighLevelRole</BSpinner
+                  >
                   Grant
                 </button>
-
-
-                
-                
               </div>
-
             </div>
           </b-modal>
         </div>
@@ -196,7 +201,7 @@
         <h2 class="title tr-gray-two mb-md-4 font-weight-bolder">User Info</h2>
 
         <p>
-         ID: <span>{{ userDetails.user._id }}</span>
+          ID: <span>{{ userDetails.user._id }}</span>
         </p>
         <p>
           First name: <span>{{ userDetails.user.firstName }}</span>
@@ -257,7 +262,8 @@
           Mobile country: <span>{{ userDetails.user.mobileCountry }}</span>
         </p>
         <p>
-          Mobile verifiedat: <span>{{ userDetails.user.mobileVerifiedAt }}</span>
+          Mobile verifiedat:
+          <span>{{ userDetails.user.mobileVerifiedAt }}</span>
         </p>
         <p>
           Signedat: <span>{{ userDetails.user.signedAt }}</span>
@@ -266,13 +272,15 @@
         <p v-if="userDetails.file">
           {{ userDetails.file.filename }}
 
-          <button class="btn-green btn" @click.prevent="downloadFile()">
+          <button class="btn-green btn" @click.prevent="downloadFiles()">
             Download File
           </button>
         </p>
 
         <div v-if="userDetails.application">
-          <h2 class="title tr-gray-two mb-md-3 mt-md-5 font-weight-bolder">Application Info</h2>
+          <h2 class="title tr-gray-two mb-md-3 mt-md-5 font-weight-bolder">
+            Application Info
+          </h2>
           <p>
             Latitude: <span> {{ userDetails.application.latitude }}</span>
           </p>
@@ -303,7 +311,16 @@
           </p>
           <p>
             Type:
-            <span> {{ userDetails.application.type }} - {{ userDetails.application.type === 1 ? "Planter" : (userDetails.application.type === 2 ? "Organization" : "Member of Organization" ) }}</span>
+            <span>
+              {{ userDetails.application.type }} -
+              {{
+                userDetails.application.type === 1
+                  ? "Planter"
+                  : userDetails.application.type === 2
+                  ? "Organization"
+                  : "Member of Organization"
+              }}</span
+            >
           </p>
         </div>
       </div>
@@ -319,6 +336,7 @@ import countries from "~/static/data/countries.min.json";
 import Web3Adapter from "@gnosis.pm/safe-web3-lib";
 import Safe from "@gnosis.pm/safe-core-sdk";
 import SafeServiceClient from "@gnosis.pm/safe-service-client";
+import { saveAs } from "file-saver";
 
 export default {
   layout: "dashboard",
@@ -336,33 +354,32 @@ export default {
         grantPlanterRole: false,
         joinPlanter: false,
         granHighLevelRole: false,
-      }
+      },
+      imgSrcAdmin: process.env.API_URL,
     };
   },
   async mounted() {
-
-
     await this.getUser();
 
     if (this.userDetails && this.userDetails) {
       await this.setNeededContracts();
       await this.setContractsData();
     }
+
   },
   methods: {
     changeProfile() {},
     async getUser() {
       let self = this;
       await self.$axios
-        .$get(`${process.env.API_URL}/admin/users/${self.$route.params.id}`,{
-            headers: {
-              Accept: "application/json",
-              "x-auth-userid": self.$cookies.get("userId"),
-              "x-auth-logintoken": self.$cookies.get("loginToken"),
-            },
-          })
+        .$get(`${process.env.API_URL}/admin/users/${self.$route.params.id}`, {
+          headers: {
+            Accept: "application/json",
+            "x-auth-userid": self.$cookies.get("userId"),
+            "x-auth-logintoken": self.$cookies.get("loginToken"),
+          },
+        })
         .then((result) => {
-
           self.userDetails = result;
 
           self.txData = {
@@ -415,46 +432,41 @@ export default {
           console.log(err, "err is here");
         });
     },
-    async downloadFile() {
-      if (!this.userDetails.file && !this.userDetails.file.filename) {
-        return;
-      }
-
-      let self = this;
-      await self.$axios
-        .$get(
-          `${process.env.API_URL}/files/${this.userDetails.file.filename}`,{
-            headers: {
-              Accept: "application/json",
-              "x-auth-userid": self.$cookies.get("userId"),
-              "x-auth-logintoken": self.$cookies.get("loginToken"),
+   
+    async downloadFiles() {
+      let self =this;
+       await self.$axios
+          .$get(
+            `${process.env.API_URL}/files/${self.userDetails.file.filename}`,
+            {
+              headers: {
+                accept: "application/json",
+                "x-auth-userid": self.$cookies.get("userId"),
+                "x-auth-logintoken": self.$cookies.get("loginToken"),
+              },
             },
-          },
-          {
-            responseType: "blob",
-          }
-        )
-        .then((downloadFile) => {
-          let filename =
+            {
+              responseType: "blob",
+            }
+          )
+          .then((res) => {
+            
+            let filename =
             self.userDetails.user.firstName +
             " " +
             self.userDetails.user.lastName +
             " - " +
             self.userDetails.file.filename;
 
-          let url = window.URL.createObjectURL(new Blob([downloadFile]));
-          let link = document.createElement("a");
-          link.href = url;
-          link.setAttribute("download", filename);
-          document.body.appendChild(link);
-          link.click();
-        })
-        .catch((err) => {
-          console.log(err, "err is here");
-        });
+            saveAs.saveAs(`${process.env.API_URL}/files/${self.userDetails.file.filename}`,filename);
+
+
+          })
+          .catch((error) => {
+            console.log(error, "error is here");
+          });
     },
     async sendVerifyAndReject() {
-    
       if (!confirm("Do you really want to change status?")) {
         return;
       }
@@ -463,10 +475,18 @@ export default {
 
       const path = this.userDetails.user.isVerified ? "reject" : "verify";
 
-      console.log(path,this.roleGranted,this.planterStatus,typeof this.roleGranted,typeof  this.planterStatus)
+      console.log(
+        path,
+        this.roleGranted,
+        this.planterStatus,
+        typeof this.roleGranted,
+        typeof this.planterStatus
+      );
 
-
-      if (path === 'verify' && (this.roleGranted === false || this.planterStatus !== 1)) {
+      if (
+        path === "verify" &&
+        (this.roleGranted === false || this.planterStatus !== 1)
+      ) {
         this.$bvToast.toast("This planter not exist on planter contract", {
           variant: "danger",
           title: "Not planter",
@@ -549,12 +569,15 @@ export default {
         });
 
       await this.AccessRestrictionContract.methods
-        .hasRole("0x0000000000000000000000000000000000000000000000000000000000000000", this.$cookies.get('account'))
+        .hasRole(
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+          this.$cookies.get("account")
+        )
         .call()
         .then(function (result) {
           console.log(result, "loginedUserIsAdmin result is here");
           self.loginedUserIsAdmin = result;
-        });  
+        });
     },
     async grantPlanterRole() {
       let self = this;
@@ -566,228 +589,219 @@ export default {
         return;
       }
 
-      let account = this.$cookies.get('account');
+      let account = this.$cookies.get("account");
 
       this.$web3.currentProvider.enable();
 
       try {
-
         const tx = this.AccessRestrictionContract.methods.grantRole(
           this.txData.roleValue,
           this.txData.publicAddress
         );
-        let gas = await tx.estimateGas({from: account});
+        let gas = await tx.estimateGas({ from: account });
 
-        const receipt = await this.$web3.eth.sendTransaction({
+        const receipt = await this.$web3.eth
+          .sendTransaction({
             from: account,
             to: this.AccessRestrictionContract._address,
             value: 0,
             data: tx.encodeABI(),
             gas: gas,
-            type: "0x2", 
+            type: "0x2",
             maxPriorityFeePerGas: null,
             maxFeePerGas: null,
-          }).on('transactionHash', (transactionHash) => {
-            self.$bvToast.toast(['Check progress on Etherscan'], {
-              toaster: 'b-toaster-bottom-left',
-              title: 'Processing transaction...',
-              variant: 'warning',
-              href: `${process.env.explorerUrl}/tx/${transactionHash}`,
-              bodyClass: 'fund-error',
-              noAutoHide: true
-
-            })
           })
-          .on('error', (error) => {
+          .on("transactionHash", (transactionHash) => {
+            self.$bvToast.toast(["Check progress on Etherscan"], {
+              toaster: "b-toaster-bottom-left",
+              title: "Processing transaction...",
+              variant: "warning",
+              href: `${process.env.explorerUrl}/tx/${transactionHash}`,
+              bodyClass: "fund-error",
+              noAutoHide: true,
+            });
+          })
+          .on("error", (error) => {
             console.log(error, "errorr");
             if (error.code === 32602) {
-              self.$bvToast.toast(['You don\'t have enough Ether (ETH)'], {
-                toaster: 'b-toaster-bottom-left',
-                title: 'Transaction failed',
-                variant: 'danger',
+              self.$bvToast.toast(["You don't have enough Ether (ETH)"], {
+                toaster: "b-toaster-bottom-left",
+                title: "Transaction failed",
+                variant: "danger",
                 href: `${process.env.explorerUrl}/tx/${transactionHash}`,
                 noAutoHide: true,
-                bodyClass: 'fund-error'
-              })
-            }
-            else if(error.code === -32602) {
+                bodyClass: "fund-error",
+              });
+            } else if (error.code === -32602) {
               //do nothing
-            }
-            else {
-              self.$bvToast.toast([error.message.substring(0,100)], {
-                toaster: 'b-toaster-bottom-left',
-                title: 'Transaction failed',
-                variant: 'danger',
+            } else {
+              self.$bvToast.toast([error.message.substring(0, 100)], {
+                toaster: "b-toaster-bottom-left",
+                title: "Transaction failed",
+                variant: "danger",
                 href: `${process.env.explorerUrl}/tx/${transactionHash}`,
                 noAutoHide: true,
-                bodyClass: 'fund-error'
-              })
+                bodyClass: "fund-error",
+              });
             }
+          });
 
-          })
+        if (receipt && receipt.transactionHash) {
+          this.$bvToast.toast(["Planter Role granted successfuly"], {
+            toaster: "b-toaster-bottom-left",
+            title: "Transaction is successful",
+            variant: "success",
+            href: `${process.env.explorerUrl}/tx/${receipt.transactionHash}`,
+          });
 
-
-          if (receipt && receipt.transactionHash) {
-            this.$bvToast.toast(["Planter Role granted successfuly"], {
-              toaster: "b-toaster-bottom-left",
-              title: "Transaction is successful",
-              variant: "success",
-              href: `${process.env.explorerUrl}/tx/${receipt.transactionHash}`,
-            });
-
-            this.roleGranted = true;
-          }
-
-
+          this.roleGranted = true;
+        }
       } catch (error) {
         console.log(error, "errorr");
 
-        self.$bvToast.toast([error.message.substring(0,100)], {
-          toaster: 'b-toaster-bottom-left',
-          title: 'Error occured!',
-          variant: 'danger',
+        self.$bvToast.toast([error.message.substring(0, 100)], {
+          toaster: "b-toaster-bottom-left",
+          title: "Error occured!",
+          variant: "danger",
           noAutoHide: true,
-          bodyClass: 'fund-error'
-        })  
+          bodyClass: "fund-error",
+        });
       }
-
-      
 
       this.loading.grantPlanterRole = false;
-
     },
     async granHighLevelRole() {
-
-//       const DEFAULT_ADMIN_ROLE ="0x0000000000000000000000000000000000000000000000000000000000000000";
-// const PLANTER_ROLE = web3.utils.soliditySha3("PLANTER_ROLE");
-// const DATA_MANAGER_ROLE = web3.utils.soliditySha3("DATA_MANAGER_ROLE");
-// const SCRIPT_ROLE = web3.utils.soliditySha3("SCRIPT_ROLE");
-// const VERIFIER_ROLE = web3.utils.soliditySha3("VERIFIER_ROLE");
+      //       const DEFAULT_ADMIN_ROLE ="0x0000000000000000000000000000000000000000000000000000000000000000";
+      // const PLANTER_ROLE = web3.utils.soliditySha3("PLANTER_ROLE");
+      // const DATA_MANAGER_ROLE = web3.utils.soliditySha3("DATA_MANAGER_ROLE");
+      // const SCRIPT_ROLE = web3.utils.soliditySha3("SCRIPT_ROLE");
+      // const VERIFIER_ROLE = web3.utils.soliditySha3("VERIFIER_ROLE");
 
       let roleValue = this.$web3.utils.soliditySha3("VERIFIER_ROLE");
-      if(this.selectedRole === 'datamanager') {
+      if (this.selectedRole === "datamanager") {
         roleValue = this.$web3.utils.soliditySha3("DATA_MANAGER_ROLE");
-      } else if(this.selectedRole === 'admin') {
-        roleValue = "0x0000000000000000000000000000000000000000000000000000000000000000";
+      } else if (this.selectedRole === "admin") {
+        roleValue =
+          "0x0000000000000000000000000000000000000000000000000000000000000000";
       }
-
 
       console.log(roleValue, "roleValue");
       console.log(this.txData.publicAddress, "this.txData.publicAddress");
-      
 
       let self = this;
 
       this.loading.granHighLevelRole = true;
 
-      if (!confirm(`Are you sure to grant ${this.selectedRole} Role to this wallet ${this.txData.publicAddress} ?`)) {
+      if (
+        !confirm(
+          `Are you sure to grant ${this.selectedRole} Role to this wallet ${this.txData.publicAddress} ?`
+        )
+      ) {
         this.loading.granHighLevelRole = false;
         return;
       }
 
-      let account = this.$cookies.get('account');
+      let account = this.$cookies.get("account");
 
       this.$web3.currentProvider.enable();
 
       try {
-
         const tx = this.AccessRestrictionContract.methods.grantRole(
           roleValue,
           this.txData.publicAddress
         );
-        let gas = await tx.estimateGas({from: account});
+        let gas = await tx.estimateGas({ from: account });
 
-        const receipt = await this.$web3.eth.sendTransaction({
+        const receipt = await this.$web3.eth
+          .sendTransaction({
             from: account,
             to: this.AccessRestrictionContract._address,
             value: 0,
             data: tx.encodeABI(),
             gas: gas,
-            type: "0x2", 
+            type: "0x2",
             maxPriorityFeePerGas: null,
             maxFeePerGas: null,
-          }).on('transactionHash', (transactionHash) => {
-            self.$bvToast.toast(['Check progress on Etherscan'], {
-              toaster: 'b-toaster-bottom-left',
-              title: 'Processing transaction...',
-              variant: 'warning',
-              href: `${process.env.explorerUrl}/tx/${transactionHash}`,
-              bodyClass: 'fund-error',
-              noAutoHide: true
-
-            })
           })
-          .on('error', (error) => {
+          .on("transactionHash", (transactionHash) => {
+            self.$bvToast.toast(["Check progress on Etherscan"], {
+              toaster: "b-toaster-bottom-left",
+              title: "Processing transaction...",
+              variant: "warning",
+              href: `${process.env.explorerUrl}/tx/${transactionHash}`,
+              bodyClass: "fund-error",
+              noAutoHide: true,
+            });
+          })
+          .on("error", (error) => {
             console.log(error, "errorr");
             if (error.code === 32602) {
-              self.$bvToast.toast(['You don\'t have enough Ether (ETH)'], {
-                toaster: 'b-toaster-bottom-left',
-                title: 'Transaction failed',
-                variant: 'danger',
+              self.$bvToast.toast(["You don't have enough Ether (ETH)"], {
+                toaster: "b-toaster-bottom-left",
+                title: "Transaction failed",
+                variant: "danger",
                 href: `${process.env.explorerUrl}/tx/${transactionHash}`,
                 noAutoHide: true,
-                bodyClass: 'fund-error'
-              })
-            }
-            else if(error.code === -32602) {
+                bodyClass: "fund-error",
+              });
+            } else if (error.code === -32602) {
               //do nothing
-            }
-            else {
-              self.$bvToast.toast([error.message.substring(0,100)], {
-                toaster: 'b-toaster-bottom-left',
-                title: 'Transaction failed',
-                variant: 'danger',
+            } else {
+              self.$bvToast.toast([error.message.substring(0, 100)], {
+                toaster: "b-toaster-bottom-left",
+                title: "Transaction failed",
+                variant: "danger",
                 href: `${process.env.explorerUrl}/tx/${transactionHash}`,
                 noAutoHide: true,
-                bodyClass: 'fund-error'
-              })
+                bodyClass: "fund-error",
+              });
             }
+          });
 
-          })
-
-          if (receipt && receipt.transactionHash) {
-            this.$bvToast.toast([this.selectedRole +" Role granted successfuly"], {
+        if (receipt && receipt.transactionHash) {
+          this.$bvToast.toast(
+            [this.selectedRole + " Role granted successfuly"],
+            {
               toaster: "b-toaster-bottom-left",
               title: "Transaction is successful",
               variant: "success",
               href: `${process.env.explorerUrl}/tx/${receipt.transactionHash}`,
-            });
-          }
-
+            }
+          );
+        }
       } catch (error) {
         console.log(error, "errorr");
 
-        self.$bvToast.toast([error.message.substring(0,100)], {
-          toaster: 'b-toaster-bottom-left',
-          title: 'Error occured!',
-          variant: 'danger',
+        self.$bvToast.toast([error.message.substring(0, 100)], {
+          toaster: "b-toaster-bottom-left",
+          title: "Error occured!",
+          variant: "danger",
           noAutoHide: true,
-          bodyClass: 'fund-error'
-        })  
+          bodyClass: "fund-error",
+        });
       }
 
-      
-
       this.loading.granHighLevelRole = false;
-
     },
     async joinPlanter() {
       let self = this;
 
       this.loading.joinPlanter = true;
 
-      if (!confirm("Are you sure to join planter? This transaction is irreversible!")) {
+      if (
+        !confirm(
+          "Are you sure to join planter? This transaction is irreversible!"
+        )
+      ) {
         this.loading.joinPlanter = false;
         return;
       }
 
-      let account = this.$cookies.get('account');
+      let account = this.$cookies.get("account");
 
       this.$web3.currentProvider.enable();
 
       try {
-
-       
         let tx = null;
         if (this.txData.type == 2) {
           tx = this.PlanterContract.methods.joinOrganization(
@@ -835,104 +849,95 @@ export default {
           );
         }
 
+        console.log(account, "account");
+        console.log(tx, "tx");
 
-        console.log(account, "account")
-        console.log(tx, "tx")
+        let gas = await tx.estimateGas({ from: account });
 
-
-        let gas = await tx.estimateGas({from: account});
-
-
-        console.log({
+        console.log(
+          {
             from: account,
             to: this.PlanterContract._address,
             value: 0,
             data: tx.encodeABI(),
             gas: gas,
-            type: "0x2", 
+            type: "0x2",
             maxPriorityFeePerGas: null,
             maxFeePerGas: null,
-          }, "gas");
+          },
+          "gas"
+        );
 
-        const receipt = await this.$web3.eth.sendTransaction({
+        const receipt = await this.$web3.eth
+          .sendTransaction({
             from: account,
             to: this.PlanterContract._address,
             value: 0,
             data: tx.encodeABI(),
             gas: gas,
-            type: "0x2", 
+            type: "0x2",
             maxPriorityFeePerGas: null,
             maxFeePerGas: null,
-          }).on('transactionHash', (transactionHash) => {
-            self.$bvToast.toast(['Check progress on Etherscan'], {
-              toaster: 'b-toaster-bottom-left',
-              title: 'Processing transaction...',
-              variant: 'warning',
-              href: `${process.env.explorerUrl}/tx/${transactionHash}`,
-              bodyClass: 'fund-error',
-              noAutoHide: true
-            })
           })
-          .on('error', (error) => {
+          .on("transactionHash", (transactionHash) => {
+            self.$bvToast.toast(["Check progress on Etherscan"], {
+              toaster: "b-toaster-bottom-left",
+              title: "Processing transaction...",
+              variant: "warning",
+              href: `${process.env.explorerUrl}/tx/${transactionHash}`,
+              bodyClass: "fund-error",
+              noAutoHide: true,
+            });
+          })
+          .on("error", (error) => {
             console.log(error, "on errorr");
             if (error.code === 32602) {
-              self.$bvToast.toast(['You don\'t have enough Ether (ETH)'], {
-                toaster: 'b-toaster-bottom-left',
-                title: 'Transaction failed',
-                variant: 'danger',
+              self.$bvToast.toast(["You don't have enough Ether (ETH)"], {
+                toaster: "b-toaster-bottom-left",
+                title: "Transaction failed",
+                variant: "danger",
                 noAutoHide: true,
-                bodyClass: 'fund-error'
-              })
-            }
-            else if(error.code === -32602) {
+                bodyClass: "fund-error",
+              });
+            } else if (error.code === -32602) {
               //do nothing
-            }
-            else {
-              self.$bvToast.toast([error.message.substring(0,100)], {
-                toaster: 'b-toaster-bottom-left',
-                title: 'Transaction failed',
-                variant: 'danger',
+            } else {
+              self.$bvToast.toast([error.message.substring(0, 100)], {
+                toaster: "b-toaster-bottom-left",
+                title: "Transaction failed",
+                variant: "danger",
                 href: `${process.env.explorerUrl}/tx/${transactionHash}`,
                 noAutoHide: true,
-                bodyClass: 'fund-error'
-              })
+                bodyClass: "fund-error",
+              });
             }
+          });
 
-          })
+        if (receipt && receipt.transactionHash) {
+          this.$bvToast.toast(["Planter joined successfuly"], {
+            toaster: "b-toaster-bottom-left",
+            title: "Transaction is successful",
+            variant: "success",
+            href: `${process.env.explorerUrl}/tx/${receipt.transactionHash}`,
+          });
 
-
-          if (receipt && receipt.transactionHash) {
-            this.$bvToast.toast(["Planter joined successfuly"], {
-              toaster: "b-toaster-bottom-left",
-              title: "Transaction is successful",
-              variant: "success",
-              href: `${process.env.explorerUrl}/tx/${receipt.transactionHash}`,
-            });
-
-            this.planterStatus = 1;
-          }
-
+          this.planterStatus = 1;
+        }
       } catch (error) {
         console.log(error, "errorr exception");
 
-        self.$bvToast.toast([error.message.substring(0,100)], {
-          toaster: 'b-toaster-bottom-left',
-          title: 'Error occured!',
-          variant: 'danger',
+        self.$bvToast.toast([error.message.substring(0, 100)], {
+          toaster: "b-toaster-bottom-left",
+          title: "Error occured!",
+          variant: "danger",
           noAutoHide: true,
-          bodyClass: 'fund-error'
-        })  
+          bodyClass: "fund-error",
+        });
       }
 
-
-      
-
       this.loading.joinPlanter = false;
-
     },
     async joinByAdmin() {
-
-
       if (this.roleGranted && this.planterStatus == 1) {
         this.$bvToast.toast("this planter already is planter", {
           variant: "danger",
@@ -1034,8 +1039,6 @@ export default {
         nonce: nextNonce,
       };
 
-    
-
       this.$web3.currentProvider.enable();
 
       const safeTransaction = await safeSdk.createTransaction(
@@ -1043,12 +1046,9 @@ export default {
         options
       );
 
-
       const txHash = await safeSdk.getTransactionHash(safeTransaction);
 
-
       const signature = await safeSdk.signTransactionHash(txHash);
-
 
       try {
         await safeService.proposeTransaction({
@@ -1099,7 +1099,6 @@ export default {
 </script>
 <style lang="scss" scoped>
 .user-page-details {
-
   .banner {
     background-size: 100% 100%;
     background-repeat: no-repeat;
@@ -1154,7 +1153,6 @@ export default {
         border-radius: 6px;
         color: white;
       }
-      
     }
     overflow: hidden;
     background: #ffffff;
