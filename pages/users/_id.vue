@@ -275,6 +275,7 @@
           <button class="btn-green btn" @click.prevent="downloadFiles()">
             Download File
           </button>
+          <img :src="`${imgSrcAdmin}/files/${userDetails.file.filename}`" alt="">
         </p>
 
         <div v-if="userDetails.application">
@@ -354,6 +355,7 @@ export default {
         grantPlanterRole: false,
         joinPlanter: false,
         granHighLevelRole: false,
+        avatar:false
       },
       imgSrcAdmin: process.env.API_URL,
     };
@@ -450,6 +452,7 @@ export default {
             }
           )
           .then((res) => {
+            this.loading.avatar = true
             
             let filename =
             self.userDetails.user.firstName +

@@ -29,7 +29,7 @@
             </ul>
           </div>
           <div v-show="tabsIndex === 0" class="row">
-            <div class="col-12 py-3 pl-3">
+            <div class="col-12">
               <h4 class="title-sm tr-gray-one text-left">Trees</h4>
               <div class="position-relative w-50 search-admin-user-box">
                 <input
@@ -44,7 +44,7 @@
                 />
               </div>
             </div>
-            <div class="col-12 col-md-12 p-0">
+            <div class="col-12 col-md-12 p-0  p-md-3">
               <div class="admin-user-table">
                 <b-table
                   striped
