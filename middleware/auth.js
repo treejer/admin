@@ -11,7 +11,7 @@ export default function ({ store, redirect }) {
       bodyClass: "fund-error",
     });
     store.commit("SET_SIDEBAR_INDEX", 0);
-    debugger
+    
     redirect("/");
   }
   return null;

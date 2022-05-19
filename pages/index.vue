@@ -5,7 +5,9 @@
         class="col-12 col-xl-9 col-lg-8 offset-lg-1 offset-xl-0 admin-left-side"
       >
         <div class="row">
-          <div class="col-12 p-0 col-md-11 justify-content-center text-left mt-5">
+          <div
+            class="col-12 p-0 col-md-11 justify-content-center text-left mt-5"
+          >
             <div class="row line-chart">
               <div class="col-md-12">
                 <div class="cards">
@@ -81,7 +83,7 @@ export default {
     padding: 30px;
     margin: 15px 15px;
     position: relative;
-    
+
     iframe {
       border: none;
       display: flex;
@@ -95,7 +97,7 @@ export default {
       margin-bottom: 32px;
       padding: 30px;
       margin: 15px 15px;
-       font-family: Montserrat-Medium;
+      font-family: Montserrat-Medium;
       position: relative;
       a,
       span,
@@ -105,18 +107,19 @@ export default {
       }
     }
   }
-   @media (max-width: 678px) {
-   .line-chart{
-     padding: 5px;
-     margin: 0;
-     iframe{
-       padding: 5px 15px;
-       margin: 5px;
-     }
-   } 
+}
+@media (max-width: 768px) {
+  .admin-left-side {
+    .line-chart {
+      padding: 5px;
+      margin: 0;
+      iframe {
+        padding: 5px 15px;
+        margin: 5px;
+      }
+    }
   }
 }
-
 .admin-right-side {
   margin-bottom: 150px;
   .cards {
@@ -134,13 +137,12 @@ export default {
     position: relative;
     iframe {
       border: none;
-       font-family: Montserrat-Medium;
+      font-family: Montserrat-Medium;
       a,
       span,
       p,
       div {
         font-family: Montserrat-Medium;
-        
       }
     }
   }
