@@ -1,7 +1,7 @@
 <template>
   <div class="container trees-admin">
     <div class="row pl-3 pr-3" v-if="trees">
-      <div class="users col-12 col-xl-12 col-lg-11 offset-lg-1 offset-xl-0">
+      <div class="users over-flow-scroll col-12 col-xl-12 col-lg-11 offset-lg-1 offset-xl-0">
         <div class="header-tab position-relative pb-3">
           <div class="row">
             <div class="col-md-12">
@@ -250,6 +250,10 @@ export default {
   .btn-green {
     padding: 5.5px 35px;
   }
+  .users{
+    overflow: scroll;
+    
+  }
 
   .search-admin-user {
     min-width: 100%;
@@ -289,8 +293,9 @@ export default {
     td,
     th {
       border: none;
-      font-size: 14px;
-      line-height: 17px;
+      font-size: 10px;
+      line-height: auto;
+      
 
       color: #424242;
     }
@@ -299,9 +304,14 @@ export default {
     }
 
     tr th {
-      font-size: 14px;
-      line-height: 17px;
+      font-size: 10px;
+      line-height: auto;
       color: #757575;
+    }
+    tr{
+      td{
+        padding: 2.5px;
+      }
     }
     .btn-state-admin {
       padding: 5px 15px;

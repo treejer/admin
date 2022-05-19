@@ -213,4 +213,9 @@ export default {
     }
   }
 }
+@media(max-width:768px){
+  .head-treejer-dashborad{
+    padding-top: 10px;
+  }
+}
 </style>
