@@ -7,7 +7,7 @@
         <div class="row">
           <div
             class="col-12 p-0 col-md-11 justify-content-center text-left mt-5"
-          >
+          > 
             <div class="row line-chart">
               <div class="col-md-12">
                 <div class="cards">

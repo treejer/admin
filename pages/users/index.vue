@@ -1,10 +1,10 @@
 <template>
   <div class="container users-admin" v-if="users">
     <div class="row">
-      <div class="users col-12 col-xl-12 col-lg-11 offset-lg-1 offset-xl-0">
+      <div class="users col-12 col-xl-12 col-lg-11 offset-lg-1 offset-xl-1">
         <div class="row">
           <div class="col-12 py-3 pl-3">
-            <h4 class="title-sm tr-gray-one text-left">Planters</h4>
+            <h4 class="title-sm tr-gray-one text-left">Users</h4>
             <div class="position-relative w-50 search-admin-user-box">
               <input
                 class="search-admin-user"
@@ -120,8 +120,8 @@ export default {
     Fab,
   },
 
-  async mounted() {
-    await this.getUsers();
+  mounted() {
+    this.getUsers();
 
     this.$nextTick(() => {
       this.$nuxt.$loading.start();

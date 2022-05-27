@@ -1,7 +1,7 @@
 <template>
   <div class="container user-page-details" v-if="userDetails">
     <div class="row">
-      <div class="col-12 position-relative">
+      <div class="col-12 position-relative  col-12 col-xl-12 col-lg-11 offset-lg-1 offset-xl-0">
         <div
           class="banner"
           :style="`background-image:url(${$avatarByWallet(
@@ -275,7 +275,10 @@
           <button class="btn-green btn" @click.prevent="downloadFiles()">
             Download File
           </button>
-          <img :src="`${imgSrcAdmin}/files/${userDetails.file.filename}`" alt="">
+          <img
+            :src="`${imgSrcAdmin}/files/${userDetails.file.filename}`"
+            alt=""
+          />
         </p>
 
         <div v-if="userDetails.application">
@@ -337,8 +340,7 @@ import countries from "~/static/data/countries.min.json";
 import Web3Adapter from "@gnosis.pm/safe-web3-lib";
 import Safe from "@gnosis.pm/safe-core-sdk";
 import SafeServiceClient from "@gnosis.pm/safe-service-client";
-import { saveAs } from "file-saver";
-
+import { saveAs } from 'file-saver';
 export default {
   layout: "dashboard",
   data() {
@@ -442,7 +444,7 @@ export default {
             `${process.env.API_URL}/files/${self.userDetails.file.filename}`,
             {
               headers: {
-                accept: "application/json",
+                "accept": "application/json",
                 "x-auth-userid": self.$cookies.get("userId"),
                 "x-auth-logintoken": self.$cookies.get("loginToken"),
               },
@@ -460,8 +462,9 @@ export default {
             self.userDetails.user.lastName +
             " - " +
             self.userDetails.file.filename;
+            
+            saveAs(`${process.env.API_URL}/files/${self.userDetails.file.filename}`, filename);
 
-            saveAs.saveAs(`${process.env.API_URL}/files/${self.userDetails.file.filename}`,filename);
 
 
           })

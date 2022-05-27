@@ -2,7 +2,7 @@
   <div class="container admin-security">
     <div class="row">
  
-      <div class="col-12 col-md-11 offset-md-1 offset-xl-0  col-lg-7 admin-left-side mb-5">
+      <div class="col-12 col-md-11 offset-md-1 offset-xl-1  col-lg-7 admin-left-side mb-5">
         <div class="box">
           <div class="header-box border-bottom">
             <p class="param-18 font-weight-bolder tr-gray-two">

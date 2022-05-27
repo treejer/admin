@@ -3,7 +3,7 @@
     <ul class="nav flex-column">
       <li class="nav-item pointer-event dashboard" @click="changeIndex(0)">
         <nuxt-link to="/">
-          <dashboardIcon
+          <DashboardIcon
             :activeLogo="$store.state.index === 0 ? true : false"
           />
         </nuxt-link>
@@ -20,9 +20,16 @@
           />
         </nuxt-link>
       </li>
-      <li class="nav-item pointer-event sheild" @click="changeIndex(3)">
+      <li class="nav-item pointer-event temptrees" @click="changeIndex(3)">
+        <nuxt-link to="/trees">
+          <TreesIcon
+            :activeLogo="$store.state.index === 3 ? true : false"
+          />
+        </nuxt-link>
+      </li>
+      <li class="nav-item pointer-event sheild" @click="changeIndex(4)">
         <nuxt-link to="/sheild">
-          <sheildIcon :activeLogo="$store.state.index === 3 ? true : false" />
+          <SheildIcon :activeLogo="$store.state.index === 4 ? true : false" />
         </nuxt-link>
       </li>
     </ul>
@@ -33,11 +40,18 @@
 import usersIcon from "@/components/admin/usersIcon.vue";
 import DashboardIcon from "./admin/dashboardIcon.vue";
 import TemptreesIcon from "./admin/temptreesIcon.vue";
-import sheildIcon from "./admin/sheildIcon.vue";
+import TreesIcon from "./admin/TreesIcon.vue";
+import SheildIcon from "./admin/sheildIcon.vue";
 
 export default {
   name: "Sidebar",
-  components: { usersIcon, DashboardIcon, TemptreesIcon, sheildIcon },
+  components: {
+    usersIcon,
+    DashboardIcon,
+    TemptreesIcon,
+    SheildIcon,
+    TreesIcon,
+  },
   data() {
     return {
       checkSidbar: true,

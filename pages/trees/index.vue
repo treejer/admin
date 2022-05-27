@@ -1,6 +1,6 @@
 <template>
   <div class="container trees-admin">
-    <div class="row " v-if="trees">
+    <div class="row pl-3 pr-3" v-if="trees">
       <div class="users over-flow-scroll col-12 col-xl-12 col-lg-11 offset-lg-1 offset-xl-1">
         <div class="header-tab position-relative pb-3">
           <div class="row">
@@ -11,7 +11,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="col-12 pl-0 mb-2">
+          <div class="col-12 mb-3 pl-0">
             <ul class="">
               <li
                 class="d-inline-block list-style-none pr-2 pb-2"
@@ -30,7 +30,6 @@
           </div>
           <div v-show="tabsIndex === 0" class="row">
             <div class="col-12">
-              <!-- <h4 class="title-sm tr-gray-one text-left">TempTrees</h4> -->
               <div class="position-relative w-50 search-admin-user-box">
                 <input
                   class="search-admin-user"
@@ -61,7 +60,7 @@
                     <span v-coin>{{ data.value }}</span>
                   </template>
                   <template #cell(showDetail)="data">
-                    <nuxt-link :to="`/tempTrees/${data.value}`">
+                    <nuxt-link :to="`/trees/${data.value}`">
                       <button class="btn-state-admin btn-green">Info</button>
                     </nuxt-link>
                   </template>
@@ -80,7 +79,7 @@
           </div>
           <div v-show="tabsIndex === 1"  class="col-12">
             <div class="col-12 col-md-11 mt-5">
-              <AdminMap type="tempTrees"  />
+              <AdminMap type="trees" />
             </div>
           </div>
         </div>
@@ -105,14 +104,14 @@ export default {
     return {
       tabs: [
         {
-          text: "TempTrees Funding Volume",
+          text: "Trees Funding Volume",
         },
         {
-          text: "TempTrees Planing Volume",
-        },  
+          text: "Trees Planing Volume",
+        },
       ],
       tabsIndex: 0,
-      tabName: "TempTrees Funding Volume",
+      tabName: "Trees Funding Volume",
       perPage: 20,
 
       currentPage: 1,
@@ -152,7 +151,7 @@ export default {
   middleware: "auth",
 
   async mounted() {
-    await this.getTempTress();
+    await this.getTress();
 
     this.$nextTick(() => {
       this.$nuxt.$loading.start();
@@ -172,16 +171,16 @@ export default {
   },
 
   methods: {
-    async getTempTress() {
+    async getTress() {
       let self = this;
       self.loading = true;
       await self.$axios
         .$post(`${process.env.GRAPHQL_URL}`, {
           query: `{
-             tempTrees(first:999,orderBy: createdAt, orderDirection: desc)   {
+             trees(first:999,orderBy: createdAt, orderDirection: desc)   {
                   id
 	              	planter {id}
-	              	status
+	              	
 	              	plantDate
 	              	treeSpecsEntity{
                     latitude
@@ -203,7 +202,8 @@ export default {
               toaster: "b-toaster-bottom-left",
             });
           } else {
-            self.trees = res.data.tempTrees;
+            self.trees = res.data.trees;
+            
 
             self.trees.map((item, index) => {
               self.items.push({
@@ -212,7 +212,7 @@ export default {
                 "Plant Date": self
                   .$moment(item.plantDate * 1000)
                   .strftime("%Y-%m-%d %I:%M:%S"),
-                Planter: item.planter.id,
+                Planter: item.planter ? item.planter.id : null,
                 TreeSpecsEntity:
                   item.treeSpecsEntity &&
                   item.treeSpecsEntity.latitude &&
@@ -227,6 +227,7 @@ export default {
                 showDetail: item.id,
               });
             });
+            console.log(self.items,"self.items is here")
           }
         })
         .catch((err) => {
