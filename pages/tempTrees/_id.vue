@@ -1,135 +1,138 @@
 <template>
   <div class="container user-page-details" v-if="tree">
     <div class="row">
-
-      <div class="col-12 mb-5 over-flow-scroll col-12 col-xl-12 col-lg-11 offset-lg-1 offset-xl-1">
-        <div
+      <div
         class="
-          mt-5
-          font-weight-bolder
-          param-gray-two
-          user-detail-main
-          position-relative
-          over-flow-hidden
-          w-100
+          col-12
+          mb-5
+          over-flow-scroll
+          col-12 col-xl-12 col-lg-11
+          offset-lg-1 offset-xl-1
         "
       >
-        <div class="edit-button text-capitalize">
-
-          <button
-            :class="{ disable: loading.verify }"
-            class="btn-green-md mt-1 mb-1"
-            @click="verifyTree(true)"
-          >
-            <BSpinner v-if="loading.verify" class="mr-2" small type="grow">loading.verify</BSpinner>
-              Verify
-          </button>
-
-
-          <button
-            :class="{ disable: loading.reject }"
-            class="btn-gray mt-1 mb-1"
-            @click="verifyTree(false)"
-          >
-            <BSpinner v-if="loading.reject" class="mr-2" small type="grow">loading.reject</BSpinner>
-              Reject
-          </button>
-
-
-        </div>
-
-        <h2 class="title tr-gray-two mb-md-4 font-weight-bolder">Tree Info</h2>
-
-        <p>
-         ID: <span>{{ `${$hex2Dec(tree.id)} - hex: ${tree.id}` }}</span>
-        </p>
-        <p>
-         Birth date: <span>{{
-                          $moment(tree.birthDate * 1000).strftime(
-                            "%Y-%m-%d %I:%M:%S"
-                          )
-                        }}</span>
-        </p>
-       <p>
-          Country Code: <span>{{ tree.countryCode }}</span>
-        </p>
-        <p>
-         CreatedAt: <span>{{
-                          $moment(tree.createdAt * 1000).strftime(
-                            "%Y-%m-%d %I:%M:%S"
-                          )
-                        }}</span>
-        </p>
-
-
-      <p>
-          Plant date: <span>{{
-                          $moment(tree.plantDate * 1000).strftime(
-                            "%Y-%m-%d %I:%M:%S"
-                          )
-                        }}</span>
-        </p>
-      <p>
-         Planter: <span>{{ tree.planter.id }}</span>
-        </p>
-
-        <div v-if="planterData">
-
-          <p>
-            Planter Name: <a :href="`/users/${planterData.user._id}`" target="_blank">{{ planterData.user.firstName + " " + planterData.user.lastName }}</a>
-          </p>
-
-        </div>
-
-
-         <p>
-          Status:
-          <span>{{
-          tree.status
-
-          }}</span>
-        </p>
-        <p>
-          TreeSpecs: <span><a :href="`https://ipfs.treejer.com/ipfs/${tree.treeSpecs}`" target="_blank">{{tree.treeSpecs}}</a> </span>
-        </p>
-
-
-
-       <h4>
-          Tree Specs Entity:
-        </h4>
-        <div v-if="tree.treeSpecsEntity">
-
-
-          <p>
-            <a
-              :href="`https://google.com/maps?q=loc:${tree.treeSpecsEntity.latitude / Math.pow(10, 6)},${tree.treeSpecsEntity.longitude / Math.pow(10, 6)}`"
-              target="_blank"
+        <div
+          class="
+            mt-5
+            font-weight-bolder
+            param-gray-two
+            user-detail-main
+            position-relative
+            over-flow-hidden
+            w-100
+          "
+        >
+          <div class="edit-button text-capitalize">
+            <button
+              :class="{ disable: loading.verify }"
+              class="btn-green-md mt-1 mb-1"
+              @click="verifyTree(true)"
             >
-              {{
-                `${tree.treeSpecsEntity.latitude / Math.pow(10, 6)},${tree.treeSpecsEntity.longitude / Math.pow(10, 6)}`
-              }}
-            </a>
+              <BSpinner v-if="loading.verify" class="mr-2" small type="grow"
+                >loading.verify</BSpinner
+              >
+              Verify
+            </button>
+
+            <button
+              :class="{ disable: loading.reject }"
+              class="btn-gray mt-1 mb-1"
+              @click="verifyTree(false)"
+            >
+              <BSpinner v-if="loading.reject" class="mr-2" small type="grow"
+                >loading.reject</BSpinner
+              >
+              Reject
+            </button>
+          </div>
+
+          <h2 class="title tr-gray-two mb-md-4 font-weight-bolder">
+            Tree Info
+          </h2>
+
+          <p>
+            ID: <span>{{ `${$hex2Dec(tree.id)} - hex: ${tree.id}` }}</span>
+          </p>
+          <p>
+            Birth date:
+            <span>{{
+              $moment(tree.birthDate * 1000).strftime("%Y-%m-%d %I:%M:%S")
+            }}</span>
+          </p>
+          <p>
+            Country Code: <span>{{ tree.countryCode }}</span>
+          </p>
+          <p>
+            CreatedAt:
+            <span>{{
+              $moment(tree.createdAt * 1000).strftime("%Y-%m-%d %I:%M:%S")
+            }}</span>
           </p>
 
+          <p>
+            Plant date:
+            <span>{{
+              $moment(tree.plantDate * 1000).strftime("%Y-%m-%d %I:%M:%S")
+            }}</span>
+          </p>
+          <p>
+            Planter: <span>{{ tree.planter.id }}</span>
+          </p>
 
+          <div v-if="planterData">
             <p>
-              Nursery: {{ tree.treeSpecsEntity.nursery ? 'Yes' : 'No' }}
+              Planter Name:
+              <a :href="`/users/${planterData.user._id}`" target="_blank">{{
+                planterData.user.firstName + " " + planterData.user.lastName
+              }}</a>
+            </p>
+          </div>
+
+          <p>
+            Status:
+            <span>{{ tree.status }}</span>
+          </p>
+          <p>
+            TreeSpecs:
+            <span
+              ><a
+                :href="`https://ipfs.treejer.com/ipfs/${tree.treeSpecs}`"
+                target="_blank"
+                >{{ tree.treeSpecs }}</a
+              >
+            </span>
+          </p>
+
+          <h4>Tree Specs Entity:</h4>
+          <div v-if="tree.treeSpecsEntity">
+            <p>
+              <a
+                :href="`https://google.com/maps?q=loc:${
+                  tree.treeSpecsEntity.latitude / Math.pow(10, 6)
+                },${tree.treeSpecsEntity.longitude / Math.pow(10, 6)}`"
+                target="_blank"
+              >
+                {{
+                  `${tree.treeSpecsEntity.latitude / Math.pow(10, 6)},${
+                    tree.treeSpecsEntity.longitude / Math.pow(10, 6)
+                  }`
+                }}
+              </a>
             </p>
 
+            <p>Nursery: {{ tree.treeSpecsEntity.nursery ? "Yes" : "No" }}</p>
 
-            <img v-for="(update, index) in tree.treeSpecsEntity.updates" :key="`update-${index}`" width="400px"  :src="update.image" :alt="`update-${index}`">
-
-
+            <img
+              v-for="(update, index) in tree.treeSpecsEntity.updates"
+              :key="`update-${index}`"
+              width="400px"
+              :src="update.image"
+              :alt="`update-${index}`"
+            />
+          </div>
         </div>
-
-
-
-        </div>
-      </div>
       </div>
     </div>
-
+  </div>
 </template>
 <script>
 import TreeFactoryABI from "~/static/abis/TreeFactory.json";

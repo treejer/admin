@@ -44,7 +44,7 @@
                 />
               </div>
             </div>
-            <div class="col-12 col-md-12 p-0  p-md-3">
+            <div class="col-12 col-md-12 mt-3 ">
               <div class="admin-user-table">
                 <b-table
                   striped

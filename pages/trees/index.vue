@@ -31,7 +31,7 @@
             </ul>
           </div>
           <div v-show="tabsIndex === 0" class="row">
-            <div class="col-12">
+            <div class="col-12  ">
               <div class="position-relative w-50 search-admin-user-box">
                 <input
                   class="search-admin-user"
