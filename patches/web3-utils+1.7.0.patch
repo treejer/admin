@@ -1,0 +1,30 @@
+diff --git a/node_modules/web3-utils/lib/index.js b/node_modules/web3-utils/lib/index.js
+index a504568..d6801a4 100644
+--- a/node_modules/web3-utils/lib/index.js
++++ b/node_modules/web3-utils/lib/index.js
+@@ -45,9 +45,9 @@ var _fireError = function (error, emitter, reject, callback, optionalData) {
+         }
+         error = error.message + "\n" + error.data;
+     }
+-    if (typeof error === 'string') {
+-        error = new Error(error);
+-    }
++    // if (typeof error === 'string') {
++    //     error = new Error(error);
++    // }
+     if (typeof callback === 'function') {
+         callback(error, optionalData);
+     }
+diff --git a/node_modules/web3-utils/src/index.js b/node_modules/web3-utils/src/index.js
+index baf01e7..3177b16 100644
+--- a/node_modules/web3-utils/src/index.js
++++ b/node_modules/web3-utils/src/index.js
+@@ -371,7 +371,7 @@ var compareBlockNumbers = function(a, b) {
+ };
+ 
+ module.exports = {
+-    _fireError: _fireError,
++    // _fireError: _fireError,
+     _jsonInterfaceMethodToString: _jsonInterfaceMethodToString,
+     _flattenTypes: _flattenTypes,
+     // extractDisplayName: extractDisplayName,

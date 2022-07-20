@@ -1,7 +1,9 @@
 <template>
   <div class="container trees-admin">
     <div class="row pl-3 pr-3" v-if="trees">
-      <div class="users over-flow-scroll col-12 col-xl-12 col-lg-11 offset-lg-1 offset-xl-1">
+      <div
+        class="users over-flow-scroll col-12 col-xl-12 col-lg-11 offset-lg-1 offset-xl-1"
+      >
         <div class="header-tab position-relative pb-3">
           <div class="row">
             <div class="col-md-12 p-md-0">
@@ -35,6 +37,7 @@
                   class="search-admin-user"
                   v-model="searchAdminUsers"
                   placeholder="Search by Id or planter address"
+                  @keyup.enter="searchAdminUsers"
                 />
                 <img
                   src="~/assets/images/tree-profile/search.svg"
@@ -43,7 +46,7 @@
                 />
               </div>
             </div>
-            <div class="col-12 col-md-12 p-0  p-md-3">
+            <div class="col-12 col-md-12 p-0 p-md-3">
               <div class="admin-user-table">
                 <b-table
                   striped
@@ -73,14 +76,90 @@
                 :per-page="perPage"
                 align="fill"
                 size="sm"
-                aria-controls="tree-table"
-              ></b-pagination>
+              >
+              </b-pagination>
+              <div
+                v-if="totalRows <= 20"
+                class="d-flex justify-content-center position-relative arrows-box"
+              >
+                <button
+                  :style="`width : 175px;left:19.9%`"
+                  class="pointer-event"
+                  @click.prevent="prePage()"
+                >
+                  Pre
+                </button>
+                <button
+                  :style="`width : 175px;left:66.8%`"
+                  class="pointer-event"
+                  @click.prevent="nextPage()"
+                >
+                  Next
+                </button>
+              </div>
+               <div
+                v-else-if="totalRows <= 60"
+                class="d-flex justify-content-center position-relative arrows-box"
+              >
+                <button
+                  :style="`width :200px;left: 10%`"
+                  class="pointer-event"
+                  @click.prevent="prePage()"
+                >
+                  Pre
+                </button>
+                <button
+                  :style="`width : 200px;left: 66%`"
+                  class="pointer-event"
+                  @click.prevent="nextPage()"
+                >
+                  Next
+                </button>
+              </div>
+              <div
+                v-else-if="totalRows >= 60"
+                class="d-flex justify-content-center position-relative arrows-box"
+              >
+                <button
+                  :style="`width :114px;left: 11.2%`"
+                  class="pointer-event"
+                  @click.prevent="prePage()"
+                >
+                  Pre
+                </button>
+                <button
+                  :style="`width : 114px;left: 78.2%`"
+                  class="pointer-event"
+                  @click.prevent="nextPage()"
+                >
+                  Next
+                </button>
+              </div>
+              <div
+                v-else
+                class="d-flex justify-content-center position-relative arrows-box"
+              >
+                <button
+                  :style="`width :175px;left:10%`"
+                  class="pointer-event"
+                  @click.prevent="prePage()"
+                >
+                  Pre
+                </button>
+                <button
+                  :style="`width :175px;left:75%`"
+                  class="pointer-event"
+                  @click.prevent="nextPage()"
+                >
+                  Next
+                </button>
+              </div>
             </div>
           </div>
-          <div v-show="tabsIndex === 1"  class="col-12">
-            <div class="col-12 col-md-11 mt-5">
+          <div v-show="tabsIndex === 1" class="col-12">
+            <!-- <div class="col-12 col-md-11 mt-5">
               <AdminMap type="trees" />
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
@@ -113,12 +192,11 @@ export default {
       tabsIndex: 0,
       tabName: "Trees Funding Volume",
       perPage: 20,
-
       currentPage: 1,
+      totalRows: 20,
       trees: null,
       searchAdminUsers: "",
       fields: [
-        { key: "Number" },
         {
           key: "id",
           label: "ID",
@@ -152,7 +230,7 @@ export default {
 
   async mounted() {
     await this.getTress();
-
+    // this.totalRows = this.trees.length
     this.$nextTick(() => {
       this.$nuxt.$loading.start();
       if (this.trees) {
@@ -162,25 +240,21 @@ export default {
       }
     });
   },
-  computed: {
-    totalRows() {
-      if (this.trees) {
-        return this.trees.length;
-      }
-    },
-  },
+  computed: {},
 
   methods: {
     async getTress() {
       let self = this;
       self.loading = true;
+
       await self.$axios
         .$post(`${process.env.GRAPHQL_URL}`, {
           query: `{
-             trees(first:999,orderBy: createdAt, orderDirection: desc)   {
+             trees(first:${self.currentPage * self.perPage},after:${
+            self.totalRows
+          },orderBy: createdAt, orderDirection: desc)   {
                   id
 	              	planter {id}
-	              	
 	              	plantDate
 	              	treeSpecsEntity{
                     latitude
@@ -203,8 +277,7 @@ export default {
             });
           } else {
             self.trees = res.data.trees;
-            
-
+            console.log(self.trees, "self.items is here");
             self.trees.map((item, index) => {
               self.items.push({
                 Number: index + 1,
@@ -227,7 +300,7 @@ export default {
                 showDetail: item.id,
               });
             });
-            console.log(self.items,"self.items is here")
+            console.log(self.items, "self.items is here");
           }
         })
         .catch((err) => {
@@ -243,17 +316,55 @@ export default {
       this.tabsIndex = index;
       this.tabName = item;
     },
+    nextPage() {
+      this.currentPage++;
+      this.totalRows = this.currentPage * this.perPage;
+      console.log(this.totalRows, "this.totalRows");
+      this.getTress();
+    },
+    prePage() {
+      this.currentPage--;
+      this.totalRows = this.currentPage * this.perPage;
+      console.log(this.totalRows, "this.totalRows");
+      this.getTress();
+    },
   },
 };
 </script>
 <style lang="scss" scoped>
 .trees-admin {
+  .arrows-box {
+    button {
+      background: #faf8f1;
+      position: absolute;
+      width: 175px;
+      padding-bottom: 3px;
+      border: solid 1px lightgray;
+      top: -46px;
+      z-index: +9999;
+
+      color: #545454;
+    }
+    #next {
+      left: 66.8%;
+    }
+    #nexts {
+      left: 78.2%;
+      width: 114px;
+    }
+    #pre {
+      left: 16.8%;
+    }
+    #pres {
+      left: 10.9%;
+      width: 114px;
+    }
+  }
   .btn-green {
     padding: 5.5px 35px;
   }
-  .users{
+  .users {
     overflow: scroll;
-    
   }
 
   .search-admin-user {
@@ -296,7 +407,6 @@ export default {
       border: none;
       font-size: 10px;
       line-height: auto;
-      
 
       color: #424242;
     }
@@ -309,8 +419,8 @@ export default {
       line-height: auto;
       color: #757575;
     }
-    tr{
-      td{
+    tr {
+      td {
         padding: 2.5px;
       }
     }
