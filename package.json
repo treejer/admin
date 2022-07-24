@@ -10,7 +10,6 @@
     "start": "nuxt start",
     "generate": "nuxt generate",
     "web3-utils": "patch-package"
-
   },
   "dependencies": {
     "@braid/vue-formulate": "^2.4.3",

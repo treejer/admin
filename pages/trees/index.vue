@@ -183,14 +183,14 @@ export default {
     return {
       tabs: [
         {
-          text: "Trees Funding Volume",
+          text: "Trees List",
         },
         {
-          text: "Trees Planing Volume",
+          text: "Trees On Map",
         },
       ],
       tabsIndex: 0,
-      tabName: "Trees Funding Volume",
+      tabName: "Trees List",
       perPage: 20,
       currentPage: 1,
       totalRows: 20,

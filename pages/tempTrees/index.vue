@@ -105,14 +105,14 @@ export default {
     return {
       tabs: [
         {
-          text: "TempTrees Funding Volume",
+          text: "Temp Trees List",
         },
         {
-          text: "TempTrees Planing Volume",
+          text: "Temp Trees Map",
         },  
       ],
       tabsIndex: 0,
-      tabName: "TempTrees Funding Volume",
+      tabName: "Temp Trees List",
       perPage: 20,
 
       currentPage: 1,
