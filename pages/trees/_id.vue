@@ -11,15 +11,15 @@
             over-flow-hidden
             w-100
           ">
-          <div class="edit-button text-capitalize">
-            <button :class="{ disable: loading.verify }" class="btn-green-md mt-1 mb-1" @click="verifyTree(true)">
+          <div class="edit-button text-capitalize" v-if="tree.lastUpdate && tree.lastUpdate.updateStatus == '1'" >
+            <button :class="{ disable: loading.verify }" class="btn-green-md mt-1 mb-1" @click="verifyUpdate(true)">
               <BSpinner v-if="loading.verify" class="mr-2" small type="grow">loading.verify</BSpinner>
-              Verify
+              Verify Update
             </button>
 
-            <button :class="{ disable: loading.reject }" class="btn-gray mt-1 mb-1" @click="verifyTree(false)">
+            <button :class="{ disable: loading.reject }" class="btn-gray mt-1 mb-1" @click="verifyUpdate(false)">
               <BSpinner v-if="loading.reject" class="mr-2" small type="grow">loading.reject</BSpinner>
-              Reject
+              Reject Update
             </button>
           </div>
 
@@ -91,7 +91,80 @@
 
             <img v-for="(update, index) in tree.treeSpecsEntity.updates" :key="`update-${index}`" width="400px"
               :src="update.image" :alt="`update-${index}`" />
+
+
+            <p v-if="tree.treeSpecsEntity.locations.length > 0">
+              Locations: 
+
+
+              <a v-for="(location, index) in tree.treeSpecsEntity.locations" :key="`treeSpecsEntity-location-${index}`"
+              
+              :href="`https://google.com/maps?q=loc:${location.latitude / Math.pow(10, 6)
+              },${location.longitude / Math.pow(10, 6)}`" target="_blank">
+                {{
+                    `${location.latitude / Math.pow(10, 6)},${location.longitude / Math.pow(10, 6)
+                    }`
+                }}
+              </a>
+
+            </p>
+
+
           </div>
+
+          <hr>
+
+          <h4 v-if="tree.lastUpdate">Last Update:</h4>
+          
+          <div v-if="tree.lastUpdate && tree.lastUpdate.updateSpecEntity">
+          <p>
+            Created At:
+            <span>{{
+                $moment(tree.lastUpdate.createdAt * 1000).strftime("%Y-%m-%d %I:%M:%S")
+            }}</span>
+          </p>
+
+            <p>
+              <a :href="`https://google.com/maps?q=loc:${tree.lastUpdate.updateSpecEntity.latitude / Math.pow(10, 6)
+              },${tree.lastUpdate.updateSpecEntity.longitude / Math.pow(10, 6)}`" target="_blank">
+                {{
+                    `${tree.lastUpdate.updateSpecEntity.latitude / Math.pow(10, 6)},${tree.lastUpdate.updateSpecEntity.longitude / Math.pow(10, 6)
+                    }`
+                }}
+              </a>
+            </p>
+
+            <p>Nursery: {{ tree.lastUpdate.updateSpecEntity.nursery ? "Yes" : "No" }}</p>
+
+            <img v-for="(update, index) in tree.lastUpdate.updateSpecEntity.updates" :key="`update-updates-${index}`" width="400px"
+              :src="update.image" :alt="`update-${index}`" />
+
+            <p>
+              UpdateSpecs On IPFS
+              <span><a :href="`https://ipfs.treejer.com/ipfs/${tree.lastUpdate.updateSpecs}`" target="_blank">{{ tree.lastUpdate.updateSpecs }}</a>
+              </span>
+            </p>
+
+            <p v-if="tree.lastUpdate.updateSpecEntity.locations.length > 0">
+              Locations: 
+
+
+              <a v-for="(location, index) in tree.lastUpdate.updateSpecEntity.locations" :key="`update-location-${index}`"
+              
+              :href="`https://google.com/maps?q=loc:${location.latitude / Math.pow(10, 6)
+              },${location.longitude / Math.pow(10, 6)}`" target="_blank">
+                {{
+                    `${location.latitude / Math.pow(10, 6)},${location.longitude / Math.pow(10, 6)
+                    }`
+                }}
+              </a>
+
+            </p>
+
+
+          </div>
+
+
         </div>
       </div>
     </div>
@@ -154,7 +227,7 @@ export default {
         });
     },
 
-    async verifyTree(status) {
+    async verifyUpdate(status) {
       let self = this;
 
       const type = status ? "verify" : "reject";
@@ -176,7 +249,7 @@ export default {
           process.env.CONTRACT_TREE_FACTORY_ADDRESS
         );
 
-        const tx = TreeFactory.methods.verifyTree(this.tree.id, status);
+        const tx = TreeFactory.methods.verifyUpdate(this.tree.id, status);
         let gas = await tx.estimateGas({ from: account });
 
         const receipt = await this.$web3.eth
@@ -226,7 +299,7 @@ export default {
 
         if (receipt && receipt.transactionHash) {
           this.$bvToast.toast(
-            ["Tree " + (status ? "Verified" : "Rejected") + " successfuly"],
+            ["Tree Update" + (status ? "Verified" : "Rejected") + " successfuly"],
             {
               toaster: "b-toaster-bottom-left",
               title: "Transaction is successful",
@@ -269,40 +342,88 @@ export default {
              createdAt
              updatedAt
 		        treeSpecsEntity{
-                      id
-                      name
-                      description
-                      externalUrl
-                      imageFs
-                      imageHash
-                      symbolFs
-                      symbolHash
-                      animationUrl
-                      diameter
-                      latitude
-                      longitude
-                      attributes
-                      updates
-                      nursery
-                      locations
-                       }
-
-                       }
-                   }
-          `,
+              id
+              name
+              description
+              externalUrl
+              imageFs
+              imageHash
+              symbolFs
+              symbolHash
+              animationUrl
+              diameter
+              latitude
+              longitude
+              attributes
+              updates
+              nursery
+              locations
+            }
+            lastUpdate {
+              updateStatus
+              updateSpecs
+              updateSpecEntity {
+                updates
+                longitude
+                latitude
+                nursery
+                locations
+              }
+              createdAt
+            }
+          }
+        }`,
         })
         .then((res) => {
           self.tree = res.data.tree;
           console.log(self.tree, "self.tree is here");
 
           if (
-            res.data.tree.treeSpecsEntity &&
-            res.data.tree.treeSpecsEntity.updates
+            res.data.tree.treeSpecsEntity
+            
           ) {
-            self.tree.treeSpecsEntity.updates = JSON.parse(
-              res.data.tree.treeSpecsEntity.updates
-            );
+
+            if(res.data.tree.treeSpecsEntity.updates) {
+              self.tree.treeSpecsEntity.updates = JSON.parse(
+                res.data.tree.treeSpecsEntity.updates
+              );
+            }
+
+            if(res.data.tree.treeSpecsEntity.locations) {
+              self.tree.treeSpecsEntity.locations = JSON.parse(
+                res.data.tree.treeSpecsEntity.locations
+              );
+            }
+            
           }
+
+          if (
+            res.data.tree.lastUpdate
+            
+          ) {
+
+            if(res.data.tree.lastUpdate.updateSpecEntity) {
+
+              if(res.data.tree.lastUpdate.updateSpecEntity.updates) {
+                self.tree.lastUpdate.updateSpecEntity.updates = JSON.parse(
+                  res.data.tree.lastUpdate.updateSpecEntity.updates
+                );
+              }
+
+              if(res.data.tree.lastUpdate.updateSpecEntity.locations) {
+                self.tree.lastUpdate.updateSpecEntity.locations = JSON.parse(
+                  res.data.tree.lastUpdate.updateSpecEntity.locations
+                );
+              }
+
+            }
+
+            
+            
+          }
+
+          
+
         })
         .catch((err) => {
           self.$bvToast.toast(err.message, {

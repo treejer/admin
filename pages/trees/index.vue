@@ -1,9 +1,7 @@
 <template>
   <div class="container trees-admin">
-    <div class="row pl-3 pr-3" v-if="trees">
-      <div
-        class="users over-flow-scroll col-12 col-xl-12 col-lg-11 offset-lg-1 offset-xl-1"
-      >
+    <div class="row pl-3 pr-3" v-if="items">
+      <div class="users over-flow-scroll col-12 col-xl-12 col-lg-11 offset-lg-1 offset-xl-1">
         <div class="header-tab position-relative pb-3">
           <div class="row">
             <div class="col-md-12 p-md-0">
@@ -15,16 +13,9 @@
         <div class="row">
           <div class="col-12 mb-3 pl-0">
             <ul class="">
-              <li
-                class="d-inline-block list-style-none pr-2 pb-2"
-                v-for="(item, index) in tabs"
-                :key="index"
-              >
-                <button
-                  @click="setIndex(item.text, index)"
-                  :class="tabsIndex === index ? 'btn-green' : 'btn-gray'"
-                  :key="index"
-                >
+              <li class="d-inline-block list-style-none pr-2 pb-2" v-for="(item, index) in tabs" :key="index">
+                <button @click="setIndex(item.text, index)" :class="tabsIndex === index ? 'btn-green' : 'btn-gray'"
+                  :key="index">
                   {{ item.text }}
                 </button>
               </li>
@@ -33,34 +24,37 @@
           <div v-show="tabsIndex === 0" class="row">
             <div class="col-12  ">
               <div class="position-relative w-50 search-admin-user-box">
-                <input
-                  class="search-admin-user"
-                  v-model="searchAdminUsers"
-                  placeholder="Search by Id or planter address"
-                  @keyup.enter="searchAdminUsers"
-                />
-                <img
-                  src="~/assets/images/tree-profile/search.svg"
-                  alt="search"
-                  class="search-icon"
-                />
+                <!-- <input class="search-admin-user" v-model="searchAdminUsers"
+                  placeholder="Search by Id or planter address" @keyup.enter="searchAdminUsers" />
+                <img src="~/assets/images/tree-profile/search.svg" alt="search" class="search-icon" /> -->
+
+                 <input class="search-admin-user" v-model="query.planter"
+                  placeholder="Planter Adress" @change="filterTrees()" />
+                <img src="~/assets/images/tree-profile/search.svg" alt="search" class="search-icon" />
+
+                <p>
+                  Have Update
+
+                  <select v-model="query.haveUpdate" @change="filterTrees()">
+                    <option value="0">All</option>
+                    <option value="1">Yes</option>
+                    <option value="2">No</option>
+                  </select>
+                </p>
+
+
+               
+
+                
+
               </div>
             </div>
             <div class="col-12 col-md-12 p-0 p-md-3">
               <div class="admin-user-table">
-                <b-table
-                  striped
-                  :current-page="currentPage"
-                  :per-page="perPage"
-                  :items="items"
-                  class="param tr-gray-three"
-                  hover
-                  :filter="searchAdminUsers"
-                  :fields="fields"
-                  id="tree-table"
-                >
+                <b-table striped :current-page="currentPage" :per-page="perPage" :items="items"
+                  class="param tr-gray-three" hover :filter="searchAdminUsers" :fields="fields" id="tree-table">
                   <template #cell(Planter)="data">
-                    <span v-coin>{{ data.value }}</span>
+                    <span>{{ data.value }}</span>
                   </template>
                   <template #cell(showDetail)="data">
                     <nuxt-link :to="`/trees/${data.value}`">
@@ -69,88 +63,38 @@
                   </template>
                 </b-table>
               </div>
-              <b-pagination
-                class="mt-4"
-                v-model="currentPage"
-                :total-rows="totalRows"
-                :per-page="perPage"
-                align="fill"
-                size="sm"
-              >
+              <b-pagination class="mt-4" v-model="currentPage" :total-rows="skip" :per-page="perPage" align="fill"
+                size="sm">
               </b-pagination>
-              <div
-                v-if="totalRows <= 20"
-                class="d-flex justify-content-center position-relative arrows-box"
-              >
-                <button
-                  :style="`width : 175px;left:19.9%`"
-                  class="pointer-event"
-                  @click.prevent="prePage()"
-                >
+              <div v-if="skip <= 20" class="d-flex justify-content-center position-relative arrows-box">
+                <button :style="`width : 175px;left:19.9%`" class="pointer-event" @click.prevent="prePage()">
                   Pre
                 </button>
-                <button
-                  :style="`width : 175px;left:66.8%`"
-                  class="pointer-event"
-                  @click.prevent="nextPage()"
-                >
+                <button :style="`width : 175px;left:66.8%`" class="pointer-event" @click.prevent="nextPage()">
                   Next
                 </button>
               </div>
-               <div
-                v-else-if="totalRows <= 60"
-                class="d-flex justify-content-center position-relative arrows-box"
-              >
-                <button
-                  :style="`width :200px;left: 10%`"
-                  class="pointer-event"
-                  @click.prevent="prePage()"
-                >
+              <div v-else-if="skip <= 60" class="d-flex justify-content-center position-relative arrows-box">
+                <button :style="`width :200px;left: 10%`" class="pointer-event" @click.prevent="prePage()">
                   Pre
                 </button>
-                <button
-                  :style="`width : 200px;left: 66%`"
-                  class="pointer-event"
-                  @click.prevent="nextPage()"
-                >
+                <button :style="`width : 200px;left: 66%`" class="pointer-event" @click.prevent="nextPage()">
                   Next
                 </button>
               </div>
-              <div
-                v-else-if="totalRows >= 60"
-                class="d-flex justify-content-center position-relative arrows-box"
-              >
-                <button
-                  :style="`width :114px;left: 11.2%`"
-                  class="pointer-event"
-                  @click.prevent="prePage()"
-                >
+              <div v-else-if="skip >= 60" class="d-flex justify-content-center position-relative arrows-box">
+                <button :style="`width :114px;left: 11.2%`" class="pointer-event" @click.prevent="prePage()">
                   Pre
                 </button>
-                <button
-                  :style="`width : 114px;left: 78.2%`"
-                  class="pointer-event"
-                  @click.prevent="nextPage()"
-                >
+                <button :style="`width : 114px;left: 78.2%`" class="pointer-event" @click.prevent="nextPage()">
                   Next
                 </button>
               </div>
-              <div
-                v-else
-                class="d-flex justify-content-center position-relative arrows-box"
-              >
-                <button
-                  :style="`width :175px;left:10%`"
-                  class="pointer-event"
-                  @click.prevent="prePage()"
-                >
+              <div v-else class="d-flex justify-content-center position-relative arrows-box">
+                <button :style="`width :175px;left:10%`" class="pointer-event" @click.prevent="prePage()">
                   Pre
                 </button>
-                <button
-                  :style="`width :175px;left:75%`"
-                  class="pointer-event"
-                  @click.prevent="nextPage()"
-                >
+                <button :style="`width :175px;left:75%`" class="pointer-event" @click.prevent="nextPage()">
                   Next
                 </button>
               </div>
@@ -193,7 +137,7 @@ export default {
       tabName: "Trees List",
       perPage: 20,
       currentPage: 1,
-      totalRows: 20,
+      skip: 0,
       trees: null,
       searchAdminUsers: "",
       fields: [
@@ -203,7 +147,7 @@ export default {
           sortable: true,
         },
         {
-          key: "Plant Date",
+          key: "CreatedAt",
           sortable: true,
         },
         {
@@ -215,7 +159,7 @@ export default {
           sortable: true,
         },
         {
-          key: "UpdatedAt",
+          key: "LastUpdateAt",
           sortable: true,
         },
         {
@@ -224,16 +168,19 @@ export default {
         },
       ],
       items: [],
+      query: {
+        haveUpdate: 0,
+      },
     };
   },
   middleware: "auth",
 
   async mounted() {
     await this.getTress();
-    // this.totalRows = this.trees.length
+    // this.skip = this.trees.length
     this.$nextTick(() => {
       this.$nuxt.$loading.start();
-      if (this.trees) {
+      if (this.items) {
         this.$nuxt.$loading.finish();
       } else {
         this.$nuxt.$loading.fail();
@@ -243,16 +190,36 @@ export default {
   computed: {},
 
   methods: {
+    async filterTrees() {
+      this.skip = 0;
+      this.currentPage = 1;
+      this.perPage = 20;
+
+      await this.getTress();
+    },
     async getTress() {
       let self = this;
       self.loading = true;
 
+      let whereQuery = "";
+      if(this.query.haveUpdate == 1){
+        whereQuery+=`lastUpdate_not: null`;
+      }
+
+      if(this.query.planter){
+        whereQuery+=`, planter: "${this.query.planter.toLowerCase()}"`;
+      }
+
+      
+      if(whereQuery != "") {
+        whereQuery = `{${whereQuery}}`
+      }
+
       await self.$axios
         .$post(`${process.env.GRAPHQL_URL}`, {
           query: `{
-             trees(first:${self.currentPage * self.perPage},after:${
-            self.totalRows
-          },orderBy: createdAt, orderDirection: desc)   {
+             trees(first:${self.currentPage * self.perPage},skip:${self.skip
+            },orderBy: createdAt, orderDirection: desc ${whereQuery ? `,where: ${whereQuery}` : ""}) {
                   id
 	              	planter {id}
 	              	plantDate
@@ -261,6 +228,11 @@ export default {
                     longitude
                     nursery
                     locations
+                  }
+                  lastUpdate {
+                    updateStatus
+                    updateSpecs
+                    createdAt
                   }
 	              	createdAt
 	              	updatedAt
@@ -276,31 +248,33 @@ export default {
               toaster: "b-toaster-bottom-left",
             });
           } else {
-            self.trees = res.data.trees;
-            console.log(self.trees, "self.items is here");
-            self.trees.map((item, index) => {
+            console.log(res.data.trees, "res.data.trees is here");
+            self.items = [];
+            res.data.trees.map((item, index) => {
               self.items.push({
                 Number: index + 1,
                 id: self.$hex2Dec(item.id),
-                "Plant Date": self
-                  .$moment(item.plantDate * 1000)
+                CreatedAt: self
+                  .$moment(item.createdAt * 1000)
                   .strftime("%Y-%m-%d %I:%M:%S"),
                 Planter: item.planter ? item.planter.id : null,
                 TreeSpecsEntity:
                   item.treeSpecsEntity &&
-                  item.treeSpecsEntity.latitude &&
-                  item.treeSpecsEntity.longitude
+                    item.treeSpecsEntity.latitude &&
+                    item.treeSpecsEntity.longitude
                     ? item.treeSpecsEntity.latitude +
-                      "," +
-                      item.treeSpecsEntity.longitude
+                    "," +
+                    item.treeSpecsEntity.longitude
                     : "Empty",
-                UpdatedAt: self
-                  .$moment(item.updatedAt * 1000)
-                  .strftime("%Y-%m-%d %I:%M:%S"),
+                LastUpdateAt: item.lastUpdate ? self
+                  .$moment(item.lastUpdate.createdAt * 1000)
+                  .strftime("%Y-%m-%d %I:%M:%S"): '-',
                 showDetail: item.id,
               });
             });
+            
             console.log(self.items, "self.items is here");
+            this.$forceUpdate();
           }
         })
         .catch((err) => {
@@ -318,17 +292,18 @@ export default {
     },
     nextPage() {
       this.currentPage++;
-      this.totalRows = this.currentPage * this.perPage;
-      console.log(this.totalRows, "this.totalRows");
+      this.skip = this.currentPage * this.perPage;
+      console.log(this.skip, "this.skip");
       this.getTress();
     },
     prePage() {
       this.currentPage--;
-      this.totalRows = this.currentPage * this.perPage;
-      console.log(this.totalRows, "this.totalRows");
+      this.skip = this.currentPage * this.perPage;
+      console.log(this.skip, "this.skip");
       this.getTress();
     },
   },
+  watch: {},
 };
 </script>
 <style lang="scss" scoped>
@@ -345,24 +320,30 @@ export default {
 
       color: #545454;
     }
+
     #next {
       left: 66.8%;
     }
+
     #nexts {
       left: 78.2%;
       width: 114px;
     }
+
     #pre {
       left: 16.8%;
     }
+
     #pres {
       left: 10.9%;
       width: 114px;
     }
   }
+
   .btn-green {
     padding: 5.5px 35px;
   }
+
   .users {
     overflow: scroll;
   }
@@ -376,23 +357,28 @@ export default {
     padding: 5px 15px;
     font-size: 14px;
   }
+
   .search-icon {
     position: absolute;
     right: 50px;
     top: 12px;
   }
+
   @media (max-width: 767px) {
     .search-admin-user-box {
       width: 100% !important;
     }
+
     .search-admin-user {
       font-size: 12px;
     }
+
     .search-icon {
       right: 5px;
       top: 8px;
     }
   }
+
   .admin-user-table {
     position: relative;
     border: 1px solid #bdbdbd;
@@ -410,6 +396,7 @@ export default {
 
       color: #424242;
     }
+
     .table thead {
       background: #e5e7db;
     }
@@ -419,11 +406,13 @@ export default {
       line-height: auto;
       color: #757575;
     }
+
     tr {
       td {
         padding: 2.5px;
       }
     }
+
     .btn-state-admin {
       padding: 5px 15px;
 
