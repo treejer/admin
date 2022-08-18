@@ -218,10 +218,7 @@ export default {
           label: "ID",
           sortable: true,
         },
-        {
-          key: "CreatedAt",
-          sortable: true,
-        },
+        
         {
           key: "Planter",
           sortable: true,
@@ -232,6 +229,10 @@ export default {
         },
         {
           key: "LastUpdateAt",
+          sortable: true,
+        },
+        {
+          key: "CreatedAt",
           sortable: true,
         },
         {
@@ -325,13 +326,13 @@ export default {
             console.log(res.data.trees, "res.data.trees is here");
             self.items = [];
             res.data.trees.map((item, index) => {
+
+              const treeId = self.$hex2Dec(item.id);
               self.items.push({
                 Number: index + 1,
-                id: self.$hex2Dec(item.id),
-                CreatedAt: self
-                  .$moment(item.createdAt * 1000)
-                  .strftime("%Y-%m-%d %I:%M:%S"),
-                Planter: item.planter ? item.planter.id : null,
+                id: treeId,
+                
+                Planter: item.planter ? item.planter.id.slice(0, 5) + '...' + item.planter.id.slice(-5) : null,
                 TreeSpecsEntity:
                   item.treeSpecsEntity &&
                   item.treeSpecsEntity.latitude &&
@@ -341,11 +342,14 @@ export default {
                       item.treeSpecsEntity.longitude
                     : "Empty",
                 LastUpdateAt: item.lastUpdate
-                  ? self
+                  ? item.lastUpdate.updateStatus + "- " +self
                       .$moment(item.lastUpdate.createdAt * 1000)
-                      .strftime("%Y-%m-%d %I:%M:%S")
+                      .strftime("%Y-%m-%d %I:%M")
                   : "-",
-                showDetail: item.id,
+                CreatedAt: self
+                  .$moment(item.createdAt * 1000)
+                  .strftime("%Y-%m-%d %I:%M:%S"),
+                showDetail: treeId
               });
             });
 

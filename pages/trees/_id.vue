@@ -117,6 +117,10 @@
           <h4 v-if="tree.lastUpdate">Last Update:</h4>
           
           <div v-if="tree.lastUpdate && tree.lastUpdate.updateSpecEntity">
+
+          <p>Status:   {{ tree.lastUpdate.updateStatus + " " + (tree.lastUpdate.updateStatus == '1' ? 'Pending' : (tree.lastUpdate.updateStatus == '3' ? 'Accepted': 'Rejected') )  }}</p>
+
+
           <p>
             Created At:
             <span>{{
@@ -136,14 +140,16 @@
 
             <p>Nursery: {{ tree.lastUpdate.updateSpecEntity.nursery ? "Yes" : "No" }}</p>
 
-            <img v-for="(update, index) in tree.lastUpdate.updateSpecEntity.updates" :key="`update-updates-${index}`" width="400px"
-              :src="update.image" :alt="`update-${index}`" />
-
-            <p>
+             <p>
               UpdateSpecs On IPFS
               <span><a :href="`https://ipfs.treejer.com/ipfs/${tree.lastUpdate.updateSpecs}`" target="_blank">{{ tree.lastUpdate.updateSpecs }}</a>
               </span>
             </p>
+
+            <img v-for="(update, index) in tree.lastUpdate.updateSpecEntity.updates" :key="`update-updates-${index}`" width="400px"
+              :src="update.image" :alt="`update-${index}`" />
+
+           
 
             <p v-if="tree.lastUpdate.updateSpecEntity.locations.length > 0">
               Locations: 
