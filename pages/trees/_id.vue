@@ -30,6 +30,14 @@
           <p>
             ID: <span>{{ `${$hex2Dec(tree.id)} - hex: ${tree.id}` }}</span>
           </p>
+
+          <img v-if="tree.treeSpecsEntity && tree.treeSpecsEntity.imageFs" :key="`${tree.treeSpecsEntity.imageHash}`" width="400px"
+              :src="tree.treeSpecsEntity.imageFs" :alt="`${tree.treeSpecsEntity.imageHash}`" />
+
+          <p v-if="tree.funder">
+            Funder: <span>{{ tree.funder.id }}</span>
+          </p>
+
           <p>
             Birth date:
             <span>{{
@@ -52,7 +60,7 @@
                 $moment(tree.plantDate * 1000).strftime("%Y-%m-%d %I:%M:%S")
             }}</span>
           </p>
-          <p>
+          <p v-if="tree.planter">
             Planter: <span>{{ tree.planter.id }}</span>
           </p>
 
@@ -67,7 +75,7 @@
 
           <p>
             Status:
-            <span>{{ tree.status }}</span>
+            <span>{{ tree.treeStatus }}</span>
           </p>
           <p>
             TreeSpecs:
@@ -89,8 +97,7 @@
 
             <p>Nursery: {{ tree.treeSpecsEntity.nursery ? "Yes" : "No" }}</p>
 
-            <img v-for="(update, index) in tree.treeSpecsEntity.updates" :key="`update-${index}`" width="400px"
-              :src="update.image" :alt="`update-${index}`" />
+            
 
 
             <p v-if="tree.treeSpecsEntity.locations.length > 0">
@@ -108,6 +115,11 @@
               </a>
 
             </p>
+
+            <img v-for="(update, index) in tree.treeSpecsEntity.updates" :key="`update-${index}`" width="400px"
+              :src="update.image" :alt="`update-${index}`" />
+
+            
 
 
           </div>
@@ -338,10 +350,13 @@ export default {
              tree(id: "${this.$dec2hex(self.$route.params.id)}"){
             id
             planter {
-            id
-              }
+              id
+            }
+            funder {
+              id
+            }
             countryCode
-             
+             treeStatus
              plantDate
              birthDate
              treeSpecs
