@@ -125,10 +125,7 @@ export default {
           label: "ID",
           sortable: true,
         },
-        {
-          key: "Plant Date",
-          sortable: true,
-        },
+        
         {
           key: "Planter",
           sortable: true,
@@ -139,6 +136,10 @@ export default {
         },
         {
           key: "UpdatedAt",
+          sortable: true,
+        },
+        {
+          key: "Plant Date",
           sortable: true,
         },
         {
@@ -206,12 +207,12 @@ export default {
             self.trees = res.data.tempTrees;
 
             self.trees.map((item, index) => {
+
+              const tempTreeId = self.$hex2Dec(item.id);
+
               self.items.push({
                 Number: index + 1,
-                id: self.$hex2Dec(item.id),
-                "Plant Date": self
-                  .$moment(item.plantDate * 1000)
-                  .strftime("%Y-%m-%d %I:%M:%S"),
+                id: tempTreeId,
                 Planter: item.planter.id,
                 TreeSpecsEntity:
                   item.treeSpecsEntity &&
@@ -224,7 +225,10 @@ export default {
                 UpdatedAt: self
                   .$moment(item.updatedAt * 1000)
                   .strftime("%Y-%m-%d %I:%M:%S"),
-                showDetail: item.id,
+                "Plant Date": self
+                  .$moment(item.plantDate * 1000)
+                  .strftime("%Y-%m-%d %I:%M:%S"),
+                showDetail: tempTreeId,
               });
             });
           }
