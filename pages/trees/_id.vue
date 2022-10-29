@@ -64,7 +64,7 @@
             Planter: <span>{{ tree.planter.id }}</span>
           </p>
 
-          <div v-if="planterData">
+          <div v-if="planterData && planterData.user">
             <p>
               Planter Name:
               <a :href="`/users/${planterData.user._id}`" target="_blank">{{
