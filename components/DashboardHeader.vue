@@ -4,11 +4,14 @@
       class="headers container-fluid dashboard-header"
       style="min-height: 5vh"
     >
+                    <ChangeNetworker v-if="$cookies.get('account')" />
+
       <keep-alive>
         <b-navbar toggleable="lg">
           <b-navbar-nav>
             <client-only>
               <div class="d-lg-none d-block">
+                
                 <Metamask @showModal="showModal" />
               </div>
             </client-only>
@@ -17,13 +20,14 @@
 
           <b-collapse
             id="nav-collapse"
-            class="text-right justify-content-between d-none"
+            class="text-right justify-content-md-end"
             is-nav
           >
-            <b-navbar-nav class="header-menu"></b-navbar-nav>
+            <b-navbar-nav class="header-menu text-center"> </b-navbar-nav>
             <client-only>
               <div class="d-lg-block d-none">
                 <Metamask @showModal="showModal" />
+
               </div>
             </client-only>
           </b-collapse>
@@ -57,13 +61,14 @@
 <script>
 import Metamask from "../components/Metamask";
 import Wallets from "../components/Wallets";
-
+import ChangeNetworker from "../components/ChangeNetworker";
 export default {
   layout: "dashboard",
   name: "TreejerHeader",
   components: {
     Wallets,
     Metamask,
+    ChangeNetworker,
   },
   data() {
     return {
@@ -124,28 +129,28 @@ export default {
       this.$bvModal.show("five");
     },
     async accountChange() {
-
-        let self = this;
+      let self = this;
 
       if (this.$cookies.get("walletName") === "metamask") {
         let self = this;
         if (process.client) {
-          await window.ethereum.on("accountsChanged", async function  (accounts) {
+          await window.ethereum.on(
+            "accountsChanged",
+            async function (accounts) {
+              let firstAccount = null;
+              await self.$web3.eth.getAccounts().then((e) => {
+                firstAccount = e[0];
+              });
 
-            let firstAccount = null;
-            await self.$web3.eth.getAccounts().then(e => { 
-              firstAccount = e[0];
-            }) 
+              this.$cookies.set("account", firstAccount);
 
-
-            this.$cookies.set("account", firstAccount);
-
-            if (self.account !== firstAccount) {
-              self.$store.commit("SET_USER", firstAccount);
-              self.$cookies.set("account", firstAccount);
-              window.location.reload;
+              if (self.account !== firstAccount) {
+                self.$store.commit("SET_USER", firstAccount);
+                self.$cookies.set("account", firstAccount);
+                window.location.reload;
+              }
             }
-          });
+          );
         }
       }
     },
@@ -186,10 +191,12 @@ export default {
     height: 34px;
     z-index: +999;
   }
-  .navbar-light .navbar-toggler {
-    display: none;
-  }
+  
 }
+.navbar-light .navbar-toggler {
+  display: none;
+}
+
 @media (max-width: 1023px) {
   .headers {
     padding: 0 10px;
@@ -213,8 +220,8 @@ export default {
     }
   }
 }
-@media(max-width:768px){
-  .head-treejer-dashborad{
+@media (max-width: 768px) {
+  .head-treejer-dashborad {
     padding-top: 10px;
   }
 }

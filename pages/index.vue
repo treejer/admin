@@ -2,7 +2,7 @@
   <div class="container">
     <div class="row">
       <div
-        class="col-12 col-xl-9 col-lg-8 offset-lg-1 offset-xl-0 admin-left-side"
+        class="col-12 col-xl-9 col-lg-8 offset-lg-1 offset-xl-0 pl-lg-5 admin-left-side"
       >
         <div class="row">
           <div

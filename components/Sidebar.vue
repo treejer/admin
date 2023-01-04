@@ -89,7 +89,8 @@ export default {
   text-align: center;
   position: fixed;
   top: 0;
-
+  z-index: +999;
+  border-radius: 0 20px 20px 0 ;
   ul {
     li {
       margin-bottom: 35px;
