@@ -2,12 +2,17 @@
   <div class="container">
     <div class="row">
       <div
-        class="col-12 col-xl-9 col-lg-8 offset-lg-1 offset-xl-0 pl-lg-5 admin-left-side"
+        class="
+          col-12 col-xl-9 col-lg-8
+          offset-lg-1 offset-xl-0
+          pl-lg-5
+          admin-left-side
+        "
       >
         <div class="row">
           <div
             class="col-12 p-0 col-md-11 justify-content-center text-left mt-5"
-          > 
+          >
             <div class="row line-chart">
               <div class="col-md-12">
                 <div class="cards">
@@ -68,10 +73,28 @@ export default {
   layout: "dashboard",
   computed: {},
   mounted() {
+    this.getAuthNounce();
     this.$nextTick(() => {
       this.$nuxt.$loading.start();
       setTimeout(() => this.$nuxt.$loading.finish(), 500);
     });
+  },
+  methods: {
+    getAuthNounce() {
+      if (this.$cookies.get("account")) {
+        this.$axios
+          .$get(`${process.env.NEST_API}/${this.$cookies.get("account")}`,{
+            headers:{
+              "Accept": "application/json, text/plain, */*",
+              "Access-Control-Allow-Origin": "*/*",
+            }
+          })
+          .then((res) => {
+            console.log(res, "res is here");
+          })
+          .catch((error) => console.log(error));
+      }
+    },
   },
 };
 </script>

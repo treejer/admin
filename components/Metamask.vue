@@ -28,11 +28,11 @@
         "
         @click.prevent="switchNetworkMatic()"
       >
-        <b-button class="connect-button switch-wallet">
+        <!-- <b-button class="connect-button switch-wallet">
           Switch to Matic
-        </b-button>
+        </b-button> -->
       </div>
-      <SignWallets />
+      <SignWallets v-if="!$cookies.get('loginToken')" />
       <div
         class="
           pointer-event

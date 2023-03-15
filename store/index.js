@@ -20,10 +20,13 @@ export const state = () => ({
   torus: null,
   connectingWallet: null,
   modalFive: false,
+  loginToken:false,
 });
 
 export const actions = {
-  async networkNames({ commit }) {
+  async networkNames({
+    commit
+  }) {
     if (process.client && this.$web3.givenProvider) {
       const web3 = this.$web3;
       //  netName = web3.version.network
@@ -64,9 +67,9 @@ export const actions = {
     await ethereum.enable();
 
     let firstAccount = null;
-    await this.$web3.eth.getAccounts().then(e => { 
+    await this.$web3.eth.getAccounts().then(e => {
       firstAccount = e[0];
-    }) 
+    })
 
     console.log(firstAccount, "account")
 
@@ -75,9 +78,11 @@ export const actions = {
       window.location.reload();
     }
   },
-  
 
-  async walletConnect({ commit }) {
+
+  async walletConnect({
+    commit
+  }) {
     let self = this;
     self.$cookies.set("walletName", "walletconnect");
 
@@ -94,7 +99,11 @@ export const actions = {
     window.location.reload;
 
   },
-  async activeIndex({ commit }, { activeIndex }) {
+  async activeIndex({
+    commit
+  }, {
+    activeIndex
+  }) {
     await commit("SET_SIDEBAR_INDEX", activeIndex);
   },
   async refreshChain() {
@@ -103,7 +112,9 @@ export const actions = {
       let currentChainId = ethereum.chainId;
     }
   },
-  async logout({ commit }) {
+  async logout({
+    commit
+  }) {
     let self = this;
     const walletName = this.$cookies.get("walletName");
     if (walletName === "metamask") {
@@ -119,10 +130,17 @@ export const actions = {
     commit("SET_USER", null);
     commit("SET_WALLET", null);
   },
-  hasDashboard({ commit }, { status }) {
+  hasDashboard({
+    commit
+  }, {
+    status
+  }) {
     commit("SET_DASHBOARD", status);
   },
-  async setEthPrice({ commit, state }) {
+  async setEthPrice({
+    commit,
+    state
+  }) {
     if (parseFloat(state.ethPrice) > 0 || parseInt(state.ethPrice) > 0) {
       return;
     }
@@ -136,11 +154,16 @@ export const actions = {
         console.log(err.message, "err setEthPrice");
       });
   },
-  async getLeaderBoards({ commit }) {
+  async getLeaderBoards({
+    commit
+  }) {
     const leaderBoards = await this.$axios.$get(
       `${process.env.apiUrl}/trees/leaderboard?perPage=10`
     );
     commit("SET_LEADERBOARDS", leaderBoards.leaderboard.data);
+  },
+  async getAuthToken(){
+    
   },
 };
 
@@ -177,4 +200,8 @@ export const mutations = {
   SET_ETH_PRICE(state, ethPrice) {
     state.ethPrice = ethPrice;
   },
+  SET_LOGIN_TOKEN(state, loginToken) {
+    state.loginToken = loginToken
+
+  }
 };

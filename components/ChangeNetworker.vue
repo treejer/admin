@@ -1,6 +1,11 @@
 <template>
   <div
     class="network-changer float-right"
+    :class="
+      $store.state.loginToken || $cookies.get('loginToken')
+        ? 'with-network-changer'
+        : 'not-network-changer'
+    "
     @click.prevent="showNetworks = !showNetworks"
   >
     <p class="btn-gray param tr-gray-seven text-capitalize">
@@ -17,7 +22,7 @@
     </p>
     <ul
       v-if="showNetworks"
-      class="list-style-none text-capitalize bg-light-green"
+      class="list-networks list-style-none text-capitalize bg-light-green"
     >
       <li
         v-if="item.key != $cookies.get('activeNetwork').key"
@@ -184,6 +189,15 @@ export default {
       });
     }
   },
+  computed: {
+    checkNetwork() {
+      if (this.$cookies.get("loginToken")) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+  },
   methods: {
     async changeNetwork(item) {
       let self = this;
@@ -228,7 +242,6 @@ export default {
     },
     setData(item) {
       this.$cookies.set("activeNetwork", item);
-      console.log(this.$cookies.get("activeNetwork"), "activeNetwork");
 
       if (item.key == "polygon") {
         this.$cookies.set("config", process.env.polygon);
@@ -239,6 +252,10 @@ export default {
       } else if (item.key == "goerli") {
         this.$cookies.set("config", process.env.goerli);
       }
+      console.log(this.$cookies.get("config"), "config cookies is here ");
+      this.$cookies.remove("loginToken");
+
+      this.$cookies.remove("userId");
     },
   },
 };
@@ -246,12 +263,13 @@ export default {
 
 <style lang="scss" scoped>
 .network-changer {
-  .alert-icon-network {
-    color: red;
-  }
   z-index: +999;
   position: relative;
   margin-top: 12px;
+  .alert-icon-network {
+    color: red;
+  }
+
   .btn-gray {
     background-color: #eeeeee;
     padding: 8px 20px 5px 15px;
@@ -285,9 +303,10 @@ export default {
 @media (max-width: 768px) {
   .network-changer {
     left: 19px;
-    top: 38px;
+    top: 30px;
     position: absolute;
     max-width: 100px;
+    z-index: +9999;
 
     .btn-gray {
       text-overflow: ellipsis;
@@ -295,6 +314,9 @@ export default {
       overflow: hidden;
       font-size: 12px;
     }
+  }
+  .with-network-changer {
+    top: 0;
   }
 }
 </style>

@@ -4,14 +4,13 @@
       class="headers container-fluid dashboard-header"
       style="min-height: 5vh"
     >
-                    <ChangeNetworker v-if="$cookies.get('account')" />
+      <ChangeNetworker v-if="$cookies.get('account')" />
 
       <keep-alive>
         <b-navbar toggleable="lg">
           <b-navbar-nav>
             <client-only>
               <div class="d-lg-none d-block">
-                
                 <Metamask @showModal="showModal" />
               </div>
             </client-only>
@@ -27,7 +26,6 @@
             <client-only>
               <div class="d-lg-block d-none">
                 <Metamask @showModal="showModal" />
-
               </div>
             </client-only>
           </b-collapse>
@@ -191,7 +189,6 @@ export default {
     height: 34px;
     z-index: +999;
   }
-  
 }
 .navbar-light .navbar-toggler {
   display: none;

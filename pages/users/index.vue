@@ -1,7 +1,7 @@
 <template>
   <div class="container users-admin" v-if="users">
     <div class="row">
-      <div class="users col-12 col-xl-12 col-lg-11 offset-lg-1 offset-xl-1">
+      <div class="users col-12 col-xl-12 col-lg-11 offset-lg-1 offset-xl-1 ">
         <div class="row">
           <div class="col-12 py-3 pl-3">
             <h4 class="title-sm tr-gray-one text-left">Users</h4>
@@ -19,7 +19,7 @@
             </div>
           </div>
           <div class="col-12 col-md-12 mt-4">
-            <div class="admin-user-table">
+            <div class="admin-user-table ">
               <b-table
                 striped
                 :current-page="currentPage"
@@ -50,7 +50,7 @@
               </b-table>
             </div>
             <b-pagination
-              class=""
+              class="mb-5 pb-5" 
               v-model="currentPage"
               :total-rows="totalRows"
               :per-page="perPage"
@@ -78,7 +78,6 @@ export default {
     return {
       users: null,
       perPage: 20,
-
       currentPage: 1,
       trees: null,
       searchAdminUsers: "",

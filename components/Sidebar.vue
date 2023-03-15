@@ -1,5 +1,5 @@
 <template>
-  <section class="sidebar pt-4 col-12 col-md-12 col-lg-1 col-xl-1">
+  <section class="sidebar pt-4 col-lg-12 col-xl-1">
     <ul class="nav flex-column">
       <li class="nav-item pointer-event dashboard" @click="changeIndex(0)">
         <nuxt-link to="/">
@@ -22,9 +22,7 @@
       </li>
       <li class="nav-item pointer-event temptrees" @click="changeIndex(3)">
         <nuxt-link to="/trees">
-          <TreesIcon
-            :activeLogo="$store.state.index === 3 ? true : false"
-          />
+          <TreesIcon :activeLogo="$store.state.index === 3 ? true : false" />
         </nuxt-link>
       </li>
       <li class="nav-item pointer-event sheild" @click="changeIndex(4)">
@@ -81,7 +79,7 @@ export default {
   },
 };
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .sidebar {
   background: #ffffff;
   box-shadow: 4px 4px 44px rgba(0, 0, 0, 0.1);
@@ -90,7 +88,7 @@ export default {
   position: fixed;
   top: 0;
   z-index: +999;
-  border-radius: 0 20px 20px 0 ;
+  border-radius: 0 20px 20px 0;
   ul {
     li {
       margin-bottom: 35px;
@@ -109,8 +107,17 @@ export default {
 }
 @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
   /* CSS */
+  .sidebar {
+    min-height: 10vh;
+    text-align: center;
+    position: relative;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    margin-left: 10%;
+    border-radius: 14px;
+  }
 }
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .sidebar {
     min-height: 10vh;
     text-align: center;

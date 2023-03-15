@@ -210,7 +210,7 @@ export default {
       try {
         const TreeFactory = new this.$web3.eth.Contract(
           TreeFactoryABI,
-          process.env.CONTRACT_TREE_FACTORY_ADDRESS
+          this.$cookies.get('config').contractTreeFactory
         );
 
         const tx = TreeFactory.methods.verifyTree(this.tree.id, status);

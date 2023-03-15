@@ -62,7 +62,7 @@
                 </select>
               </div>
             </div>
-            <div class="col-12 col-md-12 p-0 p-md-3">
+            <div class="col-12 col-md-12 p-lg-0 p-md-3">
               <div class="admin-user-table">
                 <b-table
                   striped
@@ -86,7 +86,7 @@
                 </b-table>
               </div>
               <b-pagination
-                class="mt-4"
+                class="mt-4 "
                 v-model="currentPage"
                 :total-rows="skip"
                 :per-page="perPage"
@@ -331,7 +331,6 @@ export default {
               self.items.push({
                 Number: index + 1,
                 id: treeId,
-                
                 Planter: item.planter ? item.planter.id.slice(0, 5) + '...' + item.planter.id.slice(-5) : null,
                 TreeSpecsEntity:
                   item.treeSpecsEntity &&

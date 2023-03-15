@@ -23,13 +23,12 @@ export default {
   },
   created() {},
   methods: {
-
     async getToken() {
       let self = this;
 
       await self.$axios
         .$get(
-          process.env.API_URL +
+          this.$cookies.get('config').apiUrl +
             "/user/nonce?publicAddress=" +
             self.$cookies.get("account")
         )
@@ -37,23 +36,23 @@ export default {
           console.log(res, "res is here");
 
           self.$cookies.set("loginToken", res.loginToken);
+
           self.$cookies.set("userId", res.userId);
 
           self.$web3.currentProvider.enable();
 
           var from = self.$cookies.get("account");
 
-          var signature = await self.$web3.eth.personal.sign(
-            res.message,
-            from
-          ).then((signature) => {
-
-            self.sendWebAuthToken(signature, from, res.userId);
-          }).catch((err) => {
-            console.log(err, "err");
-          });
-
-          
+          var signature = await self.$web3.eth.personal
+            .sign(res.message, from)
+            .then((signature) => {
+              self.sendWebAuthToken(signature, from, res.userId);
+              self.$store.commit("SET_LOGIN_TOKEN", true);
+              console.log(self.$store.state.loginToken,"self.$store.state.loginTokenis heere")
+            })
+            .catch((err) => {
+              console.log(err, "err");
+            });
         });
     },
     async sendWebAuthToken(signature, loginToken, userId) {
@@ -61,7 +60,7 @@ export default {
 
       await self.$axios
         .$patch(
-          `${self.api}/user/sign/?publicAddress=${self.$cookies.get(
+          `${self.$cookies.get('config').apiUrl}/user/sign/?publicAddress=${self.$cookies.get(
             "account"
           )}`,
           {
@@ -71,7 +70,6 @@ export default {
           }
         )
         .then((res) => {
-
           if (res.loginToken) {
             self.$cookies.set("loginToken", res.loginToken);
             self.hide = true;

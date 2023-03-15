@@ -376,7 +376,7 @@ export default {
     async getUser() {
       let self = this;
       await self.$axios
-        .$get(`${process.env.API_URL}/admin/users/${self.$route.params.id}`, {
+        .$get(`${this.$cookies.get('config').apiUrl}/admin/users/${self.$route.params.id}`, {
           headers: {
             Accept: "application/json",
             "x-auth-userid": self.$cookies.get("userId"),
@@ -441,7 +441,7 @@ export default {
       let self =this;
        await self.$axios
           .$get(
-            `${process.env.API_URL}/files/${self.userDetails.file.filename}`,
+            `${this.$cookies.get('config').apiUrl}/files/${self.userDetails.file.filename}`,
             {
               headers: {
                 "accept": "application/json",
@@ -463,7 +463,7 @@ export default {
             " - " +
             self.userDetails.file.filename;
             
-            saveAs(`${process.env.API_URL}/files/${self.userDetails.file.filename}`, filename);
+            saveAs(`${this.$cookies.get('config').apiUrl}/files/${self.userDetails.file.filename}`, filename);
 
 
 
@@ -503,7 +503,7 @@ export default {
 
       await self.$axios
         .$patch(
-          `${process.env.API_URL}/admin/${path}?userid=${this.userDetails.user._id}`,
+          `${this.$cookies.get('config').apiUrl}/admin/${path}?userid=${this.userDetails.user._id}`,
           {},
           {
             headers: {
@@ -550,11 +550,11 @@ export default {
     async setNeededContracts() {
       this.AccessRestrictionContract = new this.$web3.eth.Contract(
         AccessRestrictionABI,
-        process.env.CONTRACT_AR_ADDRESS
+        this.$cookies.get('config').contactArAddress
       );
       this.PlanterContract = new this.$web3.eth.Contract(
         PlanterABI,
-        process.env.CONTRACT_PLANTER_ADDRESS
+        this.$cookies.get('config').contactPlanterAddress
       );
     },
     async setContractsData() {
