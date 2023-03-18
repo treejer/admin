@@ -93,7 +93,7 @@ export default {
       let queryUrl = self.type === "tempTrees" ? "tempTrees" : "trees";
       self.loading = true;
       await self.$axios
-        .$post(`${process.env.GRAPHQL_URL}`, {
+        .$post(`${self.$cookies.get('config').graphqlUrl}`, {
           query: `{
              ${queryUrl}(orderBy: createdAt, orderDirection: desc)   {
                   id

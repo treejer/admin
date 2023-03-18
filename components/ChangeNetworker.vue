@@ -165,20 +165,20 @@ export default {
         ) {
           return;
         }
-        self.$bvToast.toast(
-          self.$t("alert.switchto") +
-            self.$cookies.get("activeNetwork").chainName +
-            " " +
-            self.$t("alert.network"),
-          {
-            title: "Wrongnetwork",
-            href: "https://blog.treejer.com/announcing-the-launch-of-treejer-protocol-with-genesis-trees/",
-            variant: "danger",
-            solid: true,
-            toaster: "b-toaster-bottom-left",
-            noAutoHide: true,
-          }
-        );
+        // self.$bvToast.toast(
+        //   self.$t("alert.switchto") +
+        //     self.$cookies.get("activeNetwork").chainName +
+        //     " " +
+        //     self.$t("alert.network"),
+        //   {
+        //     title: "Wrongnetwork",
+        //     href: "https://blog.treejer.com/announcing-the-launch-of-treejer-protocol-with-genesis-trees/",
+        //     variant: "danger",
+        //     solid: true,
+        //     toaster: "b-toaster-bottom-left",
+        //     noAutoHide: true,
+        //   }
+        // );
       });
     }
 

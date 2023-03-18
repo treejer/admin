@@ -62,7 +62,7 @@
                 </select>
               </div>
             </div>
-            <div class="col-12 col-md-12 p-lg-0 p-md-3">
+            <div class="col-12 col-md-12 p-md-3">
               <div class="admin-user-table">
                 <b-table
                   striped
@@ -288,7 +288,7 @@ export default {
       }
 
       await self.$axios
-        .$post(`${process.env.GRAPHQL_URL}`, {
+        .$post(`${self.$cookies.get('config').graphqlUrl}`, {
           query: `{
              trees(first:${self.currentPage * self.perPage},skip:${
             self.skip

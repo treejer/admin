@@ -143,7 +143,7 @@ export default {
       let self = this;
       self.loading = true;
       await this.$axios
-        .$get(`${process.env.API_URL}/admin/users?filters={}`, {
+        .$get(`${self.$cookies.get('config').apiUrl}/admin/users?filters={}`, {
           headers: {
             Accept: "application/json",
             "x-auth-userid": self.$cookies.get("userId"),

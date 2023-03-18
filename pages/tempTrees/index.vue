@@ -177,7 +177,7 @@ export default {
       let self = this;
       self.loading = true;
       await self.$axios
-        .$post(`${process.env.GRAPHQL_URL}`, {
+        .$post(`${self.$cookies.get('config').graphqlUrl}`, {
           query: `{
              tempTrees(first:999,orderBy: createdAt, orderDirection: desc)   {
                   id

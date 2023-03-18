@@ -345,7 +345,7 @@ export default {
     async getTree() {
       let self = this;
       await self.$axios
-        .$post(`${process.env.GRAPHQL_URL}`, {
+        .$post(`${self.$cookies.get('config').graphUrl}`, {
           query: `{
              tree(id: "${this.$dec2hex(self.$route.params.id)}"){
             id
