@@ -92,34 +92,34 @@ export default {
     };
   },
   async mounted() {
-    let self = this;
+    // let self = this;
     // await web3.eth.getAccounts().then(res => {
-    self.account = this.$cookies.get("account");
+    // self.account = this.$cookies.get("account");
     await this.$store.dispatch("networkNames");
     // })
-    await self.accountChange();
-    setTimeout(() => {
-      if (this.$web3.givenProvider === null) {
-        return;
-      }
+    await this.accountChange();
+    // setTimeout(() => {
+    //   if (this.$web3.givenProvider === null) {
+    //     return;
+    //   }
 
-      this.$web3.eth.net.getId().then((netId) => {
-        if (netId.toString() === process.env.NETWORK_ID.toString()) {
-          return;
-        }
-        self.$bvToast.toast(
-          "Switch to " + process.env.NETWORK_NAME + " Network",
-          {
-            title: `Wrong network`,
-            href: "https://blog.treejer.com/announcing-the-launch-of-treejer-protocol-with-genesis-trees/",
-            variant: "danger",
-            solid: true,
-            toaster: "b-toaster-bottom-left",
-            noAutoHide: true,
-          }
-        );
-      });
-    }, 1000);
+    //   this.$web3.eth.net.getId().then((netId) => {
+    //     if (netId.toString() === process.env.NETWORK_ID.toString()) {
+    //       return;
+    //     }
+    //     self.$bvToast.toast(
+    //       "Switch to " + process.env.NETWORK_NAME + " Network",
+    //       {
+    //         title: `Wrong network`,
+    //         href: "https://blog.treejer.com/announcing-the-launch-of-treejer-protocol-with-genesis-trees/",
+    //         variant: "danger",
+    //         solid: true,
+    //         toaster: "b-toaster-bottom-left",
+    //         noAutoHide: true,
+    //       }
+    //     );
+    //   });
+    // }, 1000);
   },
   computed: {},
   methods: {
