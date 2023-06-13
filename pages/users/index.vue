@@ -143,14 +143,14 @@ export default {
       let self = this;
       self.loading = true;
       await this.$axios
-        .$get(`${self.$cookies.get('config').apiUrl}/admin/users?filters={}`, {
+        .$get(`${self.$cookies.get('config').apiUrl}/admin/users`, {
           headers: {
             Accept: "application/json",
-            "x-auth-userid": self.$cookies.get("userId"),
-            "x-auth-logintoken": self.$cookies.get("loginToken"),
+            Authorization: `Bearer ${self.$cookies.get("loginToken")}`
           },
         })
         .then((res) => {
+          console.log('res user', res)
           if (res.statusCode) {
             self.$bvToast.toast(res.code, {
               variant: "danger",
@@ -175,6 +175,7 @@ export default {
           }
         })
         .catch((err) => {
+          console.log('err user', err)
           self.$bvToast.toast(err.message, {
             variant: "danger",
             title: "Forbidden",
