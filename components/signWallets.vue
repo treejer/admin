@@ -25,15 +25,13 @@ export default {
   methods: {
     async getToken() {
       let self = this;
-
       await self.$axios
         .$get(
           this.$cookies.get('config').apiUrl +
-            "/user/nonce?publicAddress=" +
+            "/nonce/" +
             self.$cookies.get("account")
         )
         .then(async (res) => {
-          console.log(res, "res is here");
 
           self.$cookies.set("loginToken", res.loginToken);
 
@@ -57,21 +55,17 @@ export default {
     },
     async sendWebAuthToken(signature, loginToken, userId) {
       let self = this;
-
       await self.$axios
-        .$patch(
-          `${self.$cookies.get('config').apiUrl}/user/sign/?publicAddress=${self.$cookies.get(
-            "account"
-          )}`,
+        .$post(
+          `${self.$cookies.get('config').apiUrl}/login/${self.$cookies.get("account")}`,
           {
-            signature: signature,
-            loginToken: loginToken,
-            userId: userId,
+            signature: signature
           }
         )
         .then((res) => {
-          if (res.loginToken) {
-            self.$cookies.set("loginToken", res.loginToken);
+          console.log('res', res)
+          if (res.access_token) {
+            self.$cookies.set("loginToken", res.access_token);
             self.hide = true;
             this.$bvToast.toast(
               `Now, you have access to the admin restricted area.`,
